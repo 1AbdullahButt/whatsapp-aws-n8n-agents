@@ -6,15 +6,22 @@ so tests never touch the network.
 """
 import httpx
 
+from shared.logging_setup import get_logger
+
 GRAPH_URL = "https://graph.facebook.com/v21.0"
+log = get_logger("tenant_desk.whatsapp")
 
 
 class WhatsAppClient:
-    def __init__(self, token, phone_number_id, base_url=GRAPH_URL, timeout=15.0):
+    def __init__(self, token, phone_number_id, base_url=GRAPH_URL, timeout=15.0,
+                 allow_templates=False):
         self.token = token
         self.phone_number_id = phone_number_id
         self.base_url = base_url
         self.timeout = timeout
+        # Template messages can be charged by Meta, so they are blocked unless
+        # someone deliberately passes allow_templates=True in code.
+        self.allow_templates = allow_templates
 
     def _headers(self):
         return {"Authorization": f"Bearer {self.token}"}
@@ -22,6 +29,9 @@ class WhatsAppClient:
     def _post_message(self, body):
         url = f"{self.base_url}/{self.phone_number_id}/messages"
         response = httpx.post(url, json=body, headers=self._headers(), timeout=self.timeout)
+        if response.is_error:
+            # Meta's error JSON says what went wrong (code, message). It holds no secrets.
+            log.error("Graph API error %s: %s", response.status_code, response.text[:500])
         response.raise_for_status()
         return response.json()
 
@@ -38,7 +48,12 @@ class WhatsAppClient:
         """Pre-approved template message, the only kind allowed outside the window.
 
         `params` fills the {{1}}, {{2}}, ... placeholders in the template body.
+        Blocked (nothing is sent) unless allow_templates is True.
         """
+        if not self.allow_templates:
+            log.warning("Template %s to tenant NOT sent: template sends are disabled "
+                        "(simulated only, they can be charged).", name)
+            return {"simulated": True}
         return self._post_message({
             "messaging_product": "whatsapp",
             "to": to,
