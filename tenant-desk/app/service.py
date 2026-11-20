@@ -41,8 +41,12 @@ class HandleResult:
     ticket_id: str = None
 
 
-def handle_message(msg, repo, wa_client, transcriber, media_dir, now):
-    """Process one IncomingMessage. `now` is passed in so tests control time."""
+def handle_message(msg, repo, wa_client, transcriber, media_dir, now, media_saver=None):
+    """Process one IncomingMessage. `now` is passed in so tests control time.
+
+    media_saver(wa_client, msg) -> path or URL of the stored audio. The local
+    server saves to media_dir; the AWS worker passes one that saves to S3.
+    """
     # 1. Dedupe first, so a repeated delivery never creates a ticket or a reply.
     # Trade-off: if we crash after this line, Meta's retry is ignored too.
     if not repo.mark_seen(msg.wa_message_id):
@@ -52,7 +56,10 @@ def handle_message(msg, repo, wa_client, transcriber, media_dir, now):
     text = msg.text
     media_path = None
     if msg.kind == "audio":
-        media_path = save_media(wa_client, msg, media_dir)
+        if media_saver is None:
+            media_path = save_media(wa_client, msg, media_dir)
+        else:
+            media_path = media_saver(wa_client, msg)
         text = transcriber.transcribe(media_path)
 
     # 3. Classify. The month matters for "no heating" (urgent only in winter).

@@ -2,5 +2,7 @@
 uvicorn
 httpx
 boto3
-moto[dynamodb]
+moto[dynamodb,s3,sqs,ssm]
 pytest
+# Lints aws/template.yaml (A4). Dev only, not used by the app.
+cfn-lint

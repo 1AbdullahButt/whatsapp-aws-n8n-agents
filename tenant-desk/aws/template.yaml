@@ -1,0 +1,136 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  tenant-desk A4 (portfolio demo): WhatsApp webhook on a Lambda function URL,
+  SQS queue with a dead-letter queue, worker Lambda, DynamoDB table, S3 bucket
+  for voice notes. Deploy only after the budget check in docs/COST_CHECKLIST.md,
+  and remove with aws/teardown.ps1 the same day.
+
+Parameters:
+  PhoneNumberId:
+    Type: String
+    Description: WhatsApp phone number ID of the test number (not a secret)
+  ParamPrefix:
+    Type: String
+    Default: /tenant-desk
+    Description: SSM Parameter Store prefix that holds the three SecureString secrets
+
+Globals:
+  Function:
+    Runtime: python3.12
+    Architectures: [x86_64]
+    CodeUri: build/
+    MemorySize: 256
+    Timeout: 30
+    Environment:
+      Variables:
+        WHATSAPP_TOKEN_PARAM: !Sub "${ParamPrefix}/whatsapp-token"
+        APP_SECRET_PARAM: !Sub "${ParamPrefix}/app-secret"
+        VERIFY_TOKEN_PARAM: !Sub "${ParamPrefix}/verify-token"
+
+Resources:
+  TicketsTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Delete
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - { AttributeName: pk, AttributeType: S }
+        - { AttributeName: sk, AttributeType: S }
+      KeySchema:
+        - { AttributeName: pk, KeyType: HASH }
+        - { AttributeName: sk, KeyType: RANGE }
+
+  MediaBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Delete
+    Properties:
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      LifecycleConfiguration:
+        Rules:
+          - Id: delete-voice-notes-after-7-days
+            Status: Enabled
+            ExpirationInDays: 7
+
+  DeadLetterQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      MessageRetentionPeriod: 345600   # 4 days
+
+  MessageQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      VisibilityTimeout: 60            # must be at least the worker timeout (30 s)
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt DeadLetterQueue.Arn
+        maxReceiveCount: 3             # 3 tries, then the dead-letter queue
+
+  WebhookFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: cloud.webhook.handler
+      Description: Checks Meta's signature and queues the webhook body
+      Timeout: 10
+      FunctionUrlConfig:
+        AuthType: NONE                 # Meta cannot sign AWS requests; the HMAC signature is the check
+      Environment:
+        Variables:
+          QUEUE_URL: !Ref MessageQueue
+      Policies:
+        - SQSSendMessagePolicy: { QueueName: !GetAtt MessageQueue.QueueName }
+        - SSMParameterReadPolicy: { ParameterName: !Sub "${ParamPrefix}/*" }
+
+  WorkerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: cloud.worker.handler
+      Description: Dedupe, ticket, plain-text reply; voice notes to S3
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref TicketsTable
+          MEDIA_BUCKET: !Ref MediaBucket
+          PHONE_NUMBER_ID: !Ref PhoneNumberId
+      Events:
+        Queue:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt MessageQueue.Arn
+            BatchSize: 1
+            FunctionResponseTypes: [ReportBatchItemFailures]
+            ScalingConfig:
+              MaximumConcurrency: 2    # at most 2 workers at once (2 is the lowest allowed)
+      Policies:
+        - DynamoDBCrudPolicy: { TableName: !Ref TicketsTable }
+        - S3CrudPolicy: { BucketName: !Ref MediaBucket }
+        - SSMParameterReadPolicy: { ParameterName: !Sub "${ParamPrefix}/*" }
+
+  WebhookLogs:
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Delete
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/${WebhookFunction}"
+      RetentionInDays: 7
+
+  WorkerLogs:
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Delete
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/${WorkerFunction}"
+      RetentionInDays: 7
+
+Outputs:
+  WebhookUrl:
+    Description: Paste this + "webhook" into Meta as the callback URL
+    Value: !GetAtt WebhookFunctionUrl.FunctionUrl
+  QueueUrl:
+    Value: !Ref MessageQueue
+  DeadLetterQueueUrl:
+    Value: !Ref DeadLetterQueue
+  TableName:
+    Value: !Ref TicketsTable
+  MediaBucketName:
+    Value: !Ref MediaBucket

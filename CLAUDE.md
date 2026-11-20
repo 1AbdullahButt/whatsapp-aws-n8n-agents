@@ -35,7 +35,7 @@ cd invoice-agent && .venv\Scripts\python -m pytest -q
 - [x] B2 n8n end to end (n8nio/n8n:2.48.7, port 5690; 176 unit tests + live e2e 11/11; start/stop in invoice-agent/docs/N8N.md). UI not clicked through by a human.
 - [x] A3 voice note + handoff on phone (21 Nov 2026; local faster-whisper base; TD-0002 voice -> heating, takeover/staff reply/release all on phone; 66 tests). Gap: "water on the floor" not urgent.
 - [x] B3 Airtable (21 Nov 2026; scripts/sync_airtable.py, upsert; fresh n8n e2e 11/11 then 12 invoices + 3 drafts + 1 error in the base; 14 API calls used; 185 tests)
-- [ ] A4 AWS (needs HUMAN_STEPS 4, after A3)
+- [ ] A4 AWS: code + SAM template written and moto-tested (78 tests, cfn-lint clean), NOT deployed. Needs HUMAN_STEPS 4 (account, budgets, CLI), then resource list + yes. See tenant-desk/aws/README.md.
 - [ ] B4 AWS
 - [ ] A5 pilot
 - [ ] B5 optional RAG

@@ -1,4 +1,4 @@
-# Tenant Desk (milestones A1-A3: local prototype, real WhatsApp text and voice notes on a test number)
+﻿# Tenant Desk (milestones A1-A3: local prototype, real WhatsApp text and voice notes on a test number)
 
 A WhatsApp maintenance desk for a small landlord or letting agent. A tenant
 sends a WhatsApp message (text or voice note) such as "my sink is leaking".
@@ -27,7 +27,7 @@ py -3.12 -m venv .venv
 .venv\Scripts\python -m pytest -q
 ```
 
-Last local run: `66 passed`. The tests need no network and no accounts.
+Last local run: `78 passed`. The tests need no network and no accounts.
 
 ## Run the server locally
 
@@ -152,7 +152,7 @@ from `requirements-voice.txt`. One tester, one phone. Steps in `docs/A3_PHONE_TE
 - Real WhatsApp beyond A2-A3: only about ten messages from one phone to a test number of an
   unpublished app. No other testers, accents, noisy audio or Urdu/English mixed voice notes.
 - Whisper accuracy is not measured; only the two transcripts above were checked by eye.
-- Real AWS: DynamoDB code has only run against moto, never a real table.
+- Real AWS: nothing deployed yet. The A4 Lambda code, SAM template and DynamoDB repository have only run against moto (see `aws/README.md`).
 - The `ticket_update` template has not been created, approved or sent for real;
   all template sends are simulated by the fake client.
 - Load, concurrency between several server processes, and long-running use.
