@@ -1,0 +1,3 @@
+# Optional: local speech-to-text for voice notes (TRANSCRIBER=whisper).
+# Not needed for the tests, which use FakeTranscriber.
+faster-whisper
