@@ -1,4 +1,4 @@
-# Tenant Desk (milestone A1: local prototype)
+# Tenant Desk (milestones A1-A2: local prototype, real WhatsApp text on a test number)
 
 A WhatsApp maintenance desk for a small landlord or letting agent. A tenant
 sends a WhatsApp message (text or voice note) such as "my sink is leaking".
@@ -27,7 +27,7 @@ py -3.12 -m venv .venv
 .venv\Scripts\python -m pytest -q
 ```
 
-Last local run: `56 passed`. The tests need no network and no accounts.
+Last local run: `63 passed`. The tests need no network and no accounts.
 
 ## Run the server locally
 
@@ -110,9 +110,25 @@ latest inbound message; outside it, only pre-approved templates.
 - Voice note path with a fake media download and `FakeTranscriber`: file saved to a temp media folder, ticket category heating.
 - Repository contract tests run against both SQLite and DynamoDB mocked by moto (`mock_aws`, fake credentials, us-east-1).
 
+### Real WhatsApp test (milestone A2, 21 Nov 2026)
+
+- One real text conversation through the WhatsApp Cloud API **test number** of an unpublished Meta app,
+  the local server on Windows, and a Cloudflare quick tunnel. One tester (the developer's own phone).
+- "Leaking tap on kitchen" arrived as a signed `POST /webhook`, created `TD-0001` (plumbing).
+  A second message went onto the same ticket and the plain-text reply
+  ("Thanks, we have added your message to ticket TD-0001.") reached the phone (Graph API 200).
+- The first reply attempt failed with Meta error 131030 because the phone was not yet on the new
+  app's recipient list. After adding it, replies worked.
+- Setup notes (second app after the first test number was banned, subscribing the app to the
+  WhatsApp Business Account, recipient list, token expiry, tunnel URL changes) are in
+  `../docs/HUMAN_STEPS.md` Steps 1-2 and `../docs/DECISIONS.md` #15.
+- Template sends are blocked in `WhatsAppClient` (nothing is sent unless code passes
+  `allow_templates=True`); only free-form replies inside the 24-hour window go out for real.
+
 ## What was not tested
 
-- Real WhatsApp: no message has been sent or received through Meta yet (milestone A2).
+- Real WhatsApp beyond A2: only a handful of text messages from one phone to a test number.
+  No voice note, staff handoff on the phone, or published app yet.
 - Real Whisper: `faster-whisper` is not installed; transcription is faked in tests.
 - Real AWS: DynamoDB code has only run against moto, never a real table.
 - The `ticket_update` template has not been created, approved or sent for real;

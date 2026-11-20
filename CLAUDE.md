@@ -31,7 +31,7 @@ cd invoice-agent && .venv\Scripts\python -m pytest -q
 - [x] Phase 1 repo setup
 - [x] A1 local prototype (59 tests green, commit 7d60bb3). Not run against real WhatsApp/Whisper/AWS yet.
 - [x] B1 local extraction (145 tests green; 99/108 fields correct on own synthetic set, the 9 misses are the image-only PDF, flagged no_text_layer)
-- [ ] A2 real WhatsApp text (needs HUMAN_STEPS 1-2)
+- [x] A2 real WhatsApp text (21 Nov 2026, second app "Tenant Desk Demo 2"; TD-0001 created, plain-text reply reached phone; 63 tests). First test number BANNED, see DECISIONS #15. Template sends blocked in code.
 - [x] B2 n8n end to end (n8nio/n8n:2.48.7, port 5690; 176 unit tests + live e2e 11/11; start/stop in invoice-agent/docs/N8N.md). UI not clicked through by a human.
 - [ ] A3 voice note + handoff on phone
 - [ ] B3 Airtable (needs HUMAN_STEPS 3)
@@ -40,4 +40,4 @@ cd invoice-agent && .venv\Scripts\python -m pytest -q
 - [ ] A5 pilot
 - [ ] B5 optional RAG
 
-Account facts: Meta app "Property Support Bot" + test number exist, no payment method. cloudflared installed. Airtable account exists, no base yet. AWS account not created (never had one, Free plan applies).
+Account facts: Meta app "Property Support Bot" test number is BANNED (unused). Active: app "Tenant Desk Demo 2" on portfolio "Abdullah Demo Lab", subscribed to its WABA, own phone on its recipient list, no payment method. Temp token lasts ~24h; tunnel URL changes on cloudflared restart. cloudflared installed. Airtable account exists, no base yet. AWS account not created (never had one, Free plan applies).
