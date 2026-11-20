@@ -97,6 +97,15 @@ class DynamoRepository(Repository):
             ExpressionAttributeValues={":m": mode},
         )
 
+    def close_ticket(self, ticket_id):
+        # get_open_ticket checks this status, so the phone's next message opens a new ticket.
+        self.table.update_item(
+            Key={"pk": f"TICKET#{ticket_id}", "sk": "META"},
+            UpdateExpression="SET #s = :s",
+            ExpressionAttributeNames={"#s": "status"},
+            ExpressionAttributeValues={":s": "closed"},
+        )
+
     def mark_urgent(self, ticket_id):
         self.table.update_item(
             Key={"pk": f"TICKET#{ticket_id}", "sk": "META"},

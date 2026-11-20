@@ -36,7 +36,17 @@ def test_cli_reply_outside_window_uses_template(repo, wa, transcriber, media_dir
     handle_message(incoming_text("My sink is leaking"), repo, wa, transcriber, media_dir, NOW)
     code, text = run(["reply", "TD-0001", "Any update?"], repo, wa, now=NOW + timedelta(days=2))
     assert "send_template" in text
+    assert "NOT messaged" in text
     assert wa.sent()[-1]["method"] == "send_template"
+
+
+def test_cli_close_then_next_message_opens_new_ticket(repo, wa, transcriber, media_dir):
+    handle_message(incoming_text("My sink is leaking", wa_id="wamid.1"), repo, wa, transcriber, media_dir, NOW)
+    code, text = run(["close", "TD-0001"], repo, wa)
+    assert code == 0 and "closed" in text
+    handle_message(incoming_text("The boiler is broken", wa_id="wamid.2"), repo, wa, transcriber, media_dir, NOW)
+    assert [t.id for t in repo.list_tickets()] == ["TD-0001", "TD-0002"]
+    assert "TD-0002" in wa.sent()[-1]["text"]
 
 
 def test_cli_unknown_ticket(repo, wa):

@@ -37,7 +37,7 @@ class Ticket:
     category: str
     urgent: bool
     mode: str  # "bot" or "human"
-    status: str  # "open" (closing tickets comes in a later milestone)
+    status: str  # "open" or "closed" (staff close it; the tenant's next message opens a new one)
     created_at: datetime
 
 
@@ -83,6 +83,9 @@ class Repository(ABC):
 
     @abstractmethod
     def mark_urgent(self, ticket_id): ...
+
+    @abstractmethod
+    def close_ticket(self, ticket_id): ...
 
     @abstractmethod
     def add_message(self, ticket_id, direction, text, at, wa_message_id=None, media_path=None): ...

@@ -104,6 +104,9 @@ class SqliteRepository(Repository):
         check_mode(mode)
         self._write("UPDATE tickets SET mode = ? WHERE id = ?", (mode, ticket_id))
 
+    def close_ticket(self, ticket_id):
+        self._write("UPDATE tickets SET status = 'closed' WHERE id = ?", (ticket_id,))
+
     def mark_urgent(self, ticket_id):
         self._write("UPDATE tickets SET urgent = 1 WHERE id = ?", (ticket_id,))
 

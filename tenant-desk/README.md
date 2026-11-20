@@ -1,4 +1,4 @@
-# Tenant Desk (milestones A1-A2: local prototype, real WhatsApp text on a test number)
+# Tenant Desk (milestones A1-A3: local prototype, real WhatsApp text and voice notes on a test number)
 
 A WhatsApp maintenance desk for a small landlord or letting agent. A tenant
 sends a WhatsApp message (text or voice note) such as "my sink is leaking".
@@ -27,7 +27,7 @@ py -3.12 -m venv .venv
 .venv\Scripts\python -m pytest -q
 ```
 
-Last local run: `63 passed`. The tests need no network and no accounts.
+Last local run: `66 passed`. The tests need no network and no accounts.
 
 ## Run the server locally
 
@@ -50,7 +50,11 @@ Staff commands:
 .venv\Scripts\python staff_cli.py takeover TD-0001
 .venv\Scripts\python staff_cli.py release TD-0001
 .venv\Scripts\python staff_cli.py reply TD-0001 "Plumber booked for Tuesday 9am"
+.venv\Scripts\python staff_cli.py close TD-0001
 ```
+
+`reply` outside the 24-hour window would need a template; real template sends are disabled,
+so the CLI says "NOT messaged" and only saves the note on the ticket.
 
 ## Architecture
 
@@ -125,11 +129,29 @@ latest inbound message; outside it, only pre-approved templates.
 - Template sends are blocked in `WhatsAppClient` (nothing is sent unless code passes
   `allow_templates=True`); only free-form replies inside the 24-hour window go out for real.
 
+### Voice note and human handoff on a phone (milestone A3, 21 Nov 2026)
+
+Same setup as A2, with `faster-whisper==1.2.1` (model `base`, CPU, int8, free and local) installed
+from `requirements-voice.txt`. One tester, one phone. Steps in `docs/A3_PHONE_TEST.md`.
+
+- A 5-second English voice note was downloaded from Meta, saved under `media/`, and transcribed
+  locally as "My boiler is broken, there is no hot water." It opened `TD-0002` (heating) and
+  the plain-text auto reply arrived. Whisper's language confidence was low (0.41) even though
+  the text was right.
+- `staff_cli.py takeover TD-0002`: the next two texts were stored with **no** auto reply.
+- `staff_cli.py reply ...`: the staff text was sent as plain text inside the 24-hour window (Graph 200).
+- `staff_cli.py release TD-0002`: the next message ("Thanks") got an auto reply again.
+- Final history, in order: in (voice), out, in, in, staff, in, out.
+- Before the phone test, a synthetic voice note (Windows text-to-speech, converted to Opus)
+  went through the real Whisper model and the same service code with a fake WhatsApp client.
+- Known gap seen in this test: "Water is now on the floor" was **not** marked urgent; the
+  urgent rules match words like "flood"/"flooding", not that phrase.
+
 ## What was not tested
 
-- Real WhatsApp beyond A2: only a handful of text messages from one phone to a test number.
-  No voice note, staff handoff on the phone, or published app yet.
-- Real Whisper: `faster-whisper` is not installed; transcription is faked in tests.
+- Real WhatsApp beyond A2-A3: only about ten messages from one phone to a test number of an
+  unpublished app. No other testers, accents, noisy audio or Urdu/English mixed voice notes.
+- Whisper accuracy is not measured; only the two transcripts above were checked by eye.
 - Real AWS: DynamoDB code has only run against moto, never a real table.
 - The `ticket_update` template has not been created, approved or sent for real;
   all template sends are simulated by the fake client.

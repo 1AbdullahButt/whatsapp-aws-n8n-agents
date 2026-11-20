@@ -5,9 +5,11 @@
     .venv\\Scripts\\python staff_cli.py takeover TD-0001   # bot stops auto replying
     .venv\\Scripts\\python staff_cli.py release TD-0001    # bot replies again
     .venv\\Scripts\\python staff_cli.py reply TD-0001 "Plumber booked for Tuesday 9am"
+    .venv\\Scripts\\python staff_cli.py close TD-0001      # tenant's next message opens a new ticket
 
-`reply` stores the text as a "staff" message and sends it to the tenant,
-as free text inside the 24h window or as the ticket_update template outside it.
+`reply` stores the text as a "staff" message and sends it to the tenant as
+free text inside the 24h window. Outside the window it would need the
+ticket_update template, and real template sends are disabled, so nothing is sent.
 """
 import argparse
 import sys
@@ -41,14 +43,19 @@ def cmd_set_mode(repo, ticket, mode, out):
 
 def cmd_reply(repo, wa_client, ticket, text, now, out):
     method = send_update(repo, wa_client, ticket, text, now, direction="staff")
-    print(f"Sent to {ticket.phone} via {method}.", file=out)
+    if method == "send_template":
+        print(f"Outside the 24h window: this needs a template (send_template). "
+              f"Real template sends are disabled, so {ticket.phone} was NOT messaged. "
+              f"The note is saved on {ticket.id}.", file=out)
+    else:
+        print(f"Sent to {ticket.phone} via {method}.", file=out)
 
 
 def build_parser():
     parser = argparse.ArgumentParser(description="Tenant desk staff tools")
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("list", help="list all tickets")
-    for name in ("show", "takeover", "release"):
+    for name in ("show", "takeover", "release", "close"):
         sub.add_parser(name).add_argument("ticket")
     reply = sub.add_parser("reply", help="send a staff message to the tenant")
     reply.add_argument("ticket")
@@ -72,6 +79,9 @@ def run(argv, repo, wa_client, now, out=sys.stdout):
         cmd_set_mode(repo, ticket, "human", out)
     elif args.command == "release":
         cmd_set_mode(repo, ticket, "bot", out)
+    elif args.command == "close":
+        repo.close_ticket(ticket.id)
+        print(f"{ticket.id} is closed. The tenant's next message opens a new ticket.", file=out)
     elif args.command == "reply":
         cmd_reply(repo, wa_client, ticket, args.text, now, out)
     return 0

@@ -80,4 +80,6 @@ Detailed click-by-click will be added before A4. Outline: sign up on the **Free 
 
 ## Step 5: phone tests and recordings (A2, A3, A5)
 
-Scripts will be added to `tenant-desk/docs/` at A2.
+- A2: `tenant-desk/docs/A2_RECORDING_SCRIPT.md` (done 21 Nov 2026).
+- A3: `tenant-desk/docs/A3_PHONE_TEST.md` (done 21 Nov 2026).
+- A5: pilot guide, to be written.

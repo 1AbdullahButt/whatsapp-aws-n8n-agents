@@ -144,7 +144,12 @@ def process_body(raw_body, deps):
 def main():
     import uvicorn
     settings = load_settings()
-    uvicorn.run(create_app(build_deps(settings)), host="127.0.0.1", port=settings.port)
+    deps = build_deps(settings)
+    if hasattr(deps.transcriber, "load"):
+        log.info("Loading Whisper model %s (first run downloads it)...", deps.transcriber.model_size)
+        deps.transcriber.load()
+        log.info("Whisper model ready")
+    uvicorn.run(create_app(deps), host="127.0.0.1", port=settings.port)
 
 
 if __name__ == "__main__":

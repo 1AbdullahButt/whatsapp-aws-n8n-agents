@@ -1,3 +1,5 @@
-# Optional: local speech-to-text for voice notes (TRANSCRIBER=whisper).
+﻿# Optional: local speech-to-text for voice notes (TRANSCRIBER=whisper).
 # Not needed for the tests, which use FakeTranscriber.
-faster-whisper
+faster-whisper==1.2.1
+# PyAV 16+ removed an option faster-whisper 1.2.1 uses; 15.1.0 has a Windows wheel.
+av==15.1.0

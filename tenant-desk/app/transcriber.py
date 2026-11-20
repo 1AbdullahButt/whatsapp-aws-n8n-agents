@@ -16,14 +16,16 @@ class FasterWhisperTranscriber:
         self.model_size = model_size
         self._model = None  # loaded on first use, it takes a few seconds
 
-    def _load(self):
-        # Imported here so the app and tests run without faster-whisper installed.
-        from faster_whisper import WhisperModel
-        self._model = WhisperModel(self.model_size, device="cpu", compute_type="int8")
+    def load(self):
+        """Load the model now. The server calls this at start, so the first
+        voice note is not slowed down by loading (or the first-time download)."""
+        if self._model is None:
+            # Imported here so the app and tests run without faster-whisper installed.
+            from faster_whisper import WhisperModel
+            self._model = WhisperModel(self.model_size, device="cpu", compute_type="int8")
 
     def transcribe(self, audio_path):
-        if self._model is None:
-            self._load()
+        self.load()
         segments, _info = self._model.transcribe(str(audio_path))
         return " ".join(segment.text.strip() for segment in segments)
 

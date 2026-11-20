@@ -74,6 +74,16 @@ def test_mark_urgent(any_repo):
     assert any_repo.get_ticket(ticket.id).urgent
 
 
+def test_close_ticket_then_new_message_needs_new_ticket(any_repo):
+    first = any_repo.create_ticket(TENANT_PHONE, "plumbing", False)
+    any_repo.close_ticket(first.id)
+    assert any_repo.get_ticket(first.id).status == "closed"
+    assert any_repo.get_open_ticket(TENANT_PHONE) is None
+    second = any_repo.create_ticket(TENANT_PHONE, "heating", False)
+    assert second.id == "TD-0002"
+    assert any_repo.get_open_ticket(TENANT_PHONE).id == "TD-0002"
+
+
 def test_history_in_order(any_repo):
     ticket = any_repo.create_ticket(TENANT_PHONE, "plumbing", False)
     any_repo.add_message(ticket.id, "in", "Leak", NOW, wa_message_id="wamid.1")
