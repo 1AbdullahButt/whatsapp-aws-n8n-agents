@@ -1,4 +1,4 @@
-# Portfolio repo: tenant-desk + invoice-agent
+﻿# Portfolio repo: tenant-desk + invoice-agent
 
 Read `docs/PLAN.md` for the full plan. This file is the short version plus current status.
 
@@ -34,10 +34,10 @@ cd invoice-agent && .venv\Scripts\python -m pytest -q
 - [x] A2 real WhatsApp text (21 Nov 2026, second app "Tenant Desk Demo 2"; TD-0001 created, plain-text reply reached phone; 63 tests). First test number BANNED, see DECISIONS #15. Template sends blocked in code.
 - [x] B2 n8n end to end (n8nio/n8n:2.48.7, port 5690; 176 unit tests + live e2e 11/11; start/stop in invoice-agent/docs/N8N.md). UI not clicked through by a human.
 - [x] A3 voice note + handoff on phone (21 Nov 2026; local faster-whisper base; TD-0002 voice -> heating, takeover/staff reply/release all on phone; 66 tests). Gap: "water on the floor" not urgent.
-- [ ] B3 Airtable (needs HUMAN_STEPS 3)
+- [x] B3 Airtable (21 Nov 2026; scripts/sync_airtable.py, upsert; fresh n8n e2e 11/11 then 12 invoices + 3 drafts + 1 error in the base; 14 API calls used; 185 tests)
 - [ ] A4 AWS (needs HUMAN_STEPS 4, after A3)
 - [ ] B4 AWS
 - [ ] A5 pilot
 - [ ] B5 optional RAG
 
-Account facts: Meta app "Property Support Bot" test number is BANNED (unused). Active: app "Tenant Desk Demo 2" on portfolio "Abdullah Demo Lab", subscribed to its WABA, own phone on its recipient list, no payment method. Temp token lasts ~24h; tunnel URL changes on cloudflared restart. cloudflared installed. Airtable account exists, no base yet. AWS account not created (never had one, Free plan applies).
+Account facts: Meta app "Property Support Bot" test number is BANNED (unused). Active: app "Tenant Desk Demo 2" on portfolio "Abdullah Demo Lab", subscribed to its WABA, own phone on its recipient list, no payment method. Temp token lasts ~24h; tunnel URL changes on cloudflared restart. cloudflared installed. Airtable base "Invoice Agent" + scoped token exist (B3 done). AWS account not created (never had one, Free plan applies).

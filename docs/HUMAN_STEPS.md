@@ -1,4 +1,4 @@
-# Steps only Abdullah can do
+﻿# Steps only Abdullah can do
 
 Secrets go **only** into the `.env` file named in each step. Never paste them in chat, commits or screenshots.
 Each project has a `.env.example`; copy it to `.env` first:
@@ -15,7 +15,7 @@ copy invoice-agent\.env.example invoice-agent\.env
 | Meta developer account, app "Property Support Bot", WhatsApp test number | First test number was BANNED by Meta (21 Nov 2026), see `docs/DECISIONS.md` #15 |
 | Second app "Tenant Desk Demo 2" on portfolio "Abdullah Demo Lab", new test number | Done, used for A2 (no payment method, keep it that way) |
 | cloudflared installed | Done |
-| Airtable account | Done. Base + token: before B3 |
+| Airtable account, base "Invoice Agent", scoped token | Done (B3, 21 Nov 2026) |
 | AWS account | After A3 |
 
 ---

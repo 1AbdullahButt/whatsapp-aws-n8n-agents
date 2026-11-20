@@ -1,4 +1,4 @@
-# invoice-agent (milestones B1 + B2)
+﻿# invoice-agent (milestones B1 + B2 + B3)
 
 Reads invoice PDFs locally, pulls out the key fields, flags anything a
 human should check, and spots invoices that were sent twice (B1). An n8n
@@ -261,9 +261,50 @@ PASS  data/ALERT_LATEST.txt written
 ### What was not tested (B2)
 
 - No real email: nothing is sent, by design. Approved reminders only go to a file.
-- No Airtable yet (B3).
+- Airtable came in B3 (below).
 - The n8n UI was not clicked through by a human. The workflows were
   imported, published and run through the CLI and webhooks only; the
   owner-account step in the browser has not been done.
 - Only the 12 synthetic invoices. No real vendor invoices.
 - One n8n instance in its default (regular) mode; no queue mode, no load test.
+
+## B3: results copied to Airtable
+
+`scripts/sync_airtable.py` copies what an n8n run left behind into an Airtable base
+(schema in `docs/AIRTABLE_SCHEMA.md`): one row per invoice in `Invoices`, the reminder
+drafts with their pending / approved / rejected status in `Reminder Drafts`, and failures
+from the error workflow in `Error Log`.
+
+```
+.venv\Scripts\python scripts\sync_airtable.py --dry-run   # build rows, no API calls
+.venv\Scripts\python scripts\sync_airtable.py             # schema check, then upsert
+```
+
+- `airtable_sync/client.py`: `AirtableClient` (httpx, Web API v0) and `FakeAirtableClient`.
+  At most 10 records per request, a short pause between requests, and a call counter.
+- Writes are **upserts** on a key field (`File`, `Draft id`, `Received at`), so a second run
+  updates rows instead of duplicating them.
+- Before writing anything it reads the base schema (1 call) and stops if a table or field
+  is missing or has the wrong type.
+- The sync runs as a script after the workflow, not as an n8n node, so no Airtable token is
+  stored in n8n or in the exported workflow JSON (see `../docs/DECISIONS.md` #16).
+
+### What was tested (B3, 21 Nov 2026)
+
+- `tests/test_airtable_sync.py` (9 tests, fake client, zero API calls): batching, schema
+  check, outcome labels, row building from real synthetic PDFs, upsert twice without
+  duplicates, dry run makes no client, request body of the real client, error handling.
+  Whole suite: `185 passed`.
+- Live, on a free Airtable base: a fresh n8n run (`scripts/e2e_n8n.py`, 11/11 checks), then
+  the sync. Result: 12 created in `Invoices` (3 paid, 2 not overdue, 3 draft created,
+  3 needs review, 1 duplicate), 3 in `Reminder Drafts` (1 pending, 1 approved, 1 rejected),
+  1 in `Error Log`. A second sync: 0 created, 16 updated.
+- Airtable API calls used on 21 Nov 2026: 14 in total (1 schema check before coding,
+  5 per sync run x 2, 3 to read the rows back). Free plan allows 1,000 per month.
+
+### What was not tested (B3)
+
+- The sync is run by hand after the workflow; it is not triggered by n8n.
+- Rows removed locally (for example after `/demo/reset`) are not deleted from Airtable.
+  Draft ids restart at 1 after a reset, so `draft-1` is overwritten by the next run's draft 1.
+- Only the 12 synthetic invoices, one base, one user.
