@@ -78,3 +78,15 @@ def validate(results, has_text_layer=True):
     if due_before_invoice_date(values["invoice_date"], values["due_date"]):
         flags.append("due_before_invoice_date")
     return ValidationResult(flags=flags)
+
+
+def blocking_flags(flags):
+    """Flags that stop the workflow before any reminder is drafted.
+
+    Everything except low_confidence_<field> blocks: a missing total or due
+    date, no text layer, or numbers that do not add up mean we cannot say
+    whether the invoice is overdue. A low-confidence field still has a
+    value, so the invoice may go on to the human approval step, where the
+    reviewer sees the flags next to the draft.
+    """
+    return [flag for flag in flags if not flag.startswith("low_confidence_")]

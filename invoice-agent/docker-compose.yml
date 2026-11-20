@@ -1,0 +1,78 @@
+# invoice-agent milestone B2: extractor API + MOCK accounting API + n8n.
+#
+#   docker compose up -d --build
+#   powershell -File scripts\n8n_setup.ps1
+#
+# Its own compose project, its own n8n volume, its own ports. It does not
+# touch any other n8n instance on this machine.
+# All host ports are bound to 127.0.0.1, so only this computer can reach them.
+name: invoice-agent
+
+services:
+  api:
+    build:
+      context: .
+      additional_contexts:
+        shared: ../shared
+    image: invoice-agent-python:b2
+    environment:
+      # Lets scripts/e2e_n8n.py empty the review queue and logs before a run.
+      DEMO_RESET_ENABLED: "true"
+    ports:
+      - "127.0.0.1:8101:8101"
+    volumes:
+      - ./inbox:/app/inbox:ro
+      - ./data:/app/data
+      - ./outbox:/app/outbox
+
+  mock-accounting:
+    # Same image as api (built by the api service), different command.
+    # Only one service builds it: two parallel builds of one image hung.
+    image: invoice-agent-python:b2
+    pull_policy: never
+    command: ["python", "-m", "uvicorn", "mock_accounting.api:app", "--host", "0.0.0.0", "--port", "8102"]
+    ports:
+      - "127.0.0.1:8102:8102"
+
+  n8n:
+    image: n8nio/n8n:2.48.7
+    depends_on:
+      - api
+      - mock-accounting
+    ports:
+      - "127.0.0.1:5690:5678"
+    environment:
+      # Encrypts n8n's stored settings. Kept in .env (gitignored).
+      N8N_ENCRYPTION_KEY: ${N8N_ENCRYPTION_KEY:?Set N8N_ENCRYPTION_KEY in invoice-agent/.env}
+      N8N_PORT: "5678"
+      N8N_PROTOCOL: http
+      N8N_HOST: localhost
+      # Resume URLs ($execution.resumeUrl) are built from this, so the
+      # review script on Windows can call them.
+      WEBHOOK_URL: http://localhost:5690/
+      N8N_EDITOR_BASE_URL: http://localhost:5690/
+      # Plain http on localhost, so the login cookie must not require https.
+      N8N_SECURE_COOKIE: "false"
+      # No telemetry, no update checks, no cloud templates or banners.
+      N8N_DIAGNOSTICS_ENABLED: "false"
+      N8N_DIAGNOSTICS_CONFIG_FRONTEND: ""
+      N8N_DIAGNOSTICS_CONFIG_BACKEND: ""
+      N8N_VERSION_NOTIFICATIONS_ENABLED: "false"
+      N8N_PERSONALIZATION_ENABLED: "false"
+      N8N_TEMPLATES_ENABLED: "false"
+      N8N_HIRING_BANNER_ENABLED: "false"
+      EXTERNAL_FRONTEND_HOOKS_URLS: ""
+      # The workflow reads REMINDER_TODAY with $env, which n8n 2.x blocks by default.
+      N8N_BLOCK_ENV_ACCESS_IN_NODE: "false"
+      # Fixed "today" so the demo always gives the same overdue invoices.
+      # Remove it to use the real date.
+      REMINDER_TODAY: "2026-11-20"
+      GENERIC_TIMEZONE: UTC
+      TZ: UTC
+    volumes:
+      - invoice_agent_n8n_data:/home/node/.n8n
+      - ./n8n/workflows:/workflows:ro
+
+volumes:
+  invoice_agent_n8n_data:
+    name: invoice_agent_n8n_data

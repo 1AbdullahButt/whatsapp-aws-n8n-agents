@@ -32,7 +32,7 @@ cd invoice-agent && .venv\Scripts\python -m pytest -q
 - [x] A1 local prototype (59 tests green, commit 7d60bb3). Not run against real WhatsApp/Whisper/AWS yet.
 - [x] B1 local extraction (145 tests green; 99/108 fields correct on own synthetic set, the 9 misses are the image-only PDF, flagged no_text_layer)
 - [ ] A2 real WhatsApp text (needs HUMAN_STEPS 1-2)
-- [ ] B2 n8n end to end
+- [x] B2 n8n end to end (n8nio/n8n:2.48.7, port 5690; 176 unit tests + live e2e 11/11; start/stop in invoice-agent/docs/N8N.md). UI not clicked through by a human.
 - [ ] A3 voice note + handoff on phone
 - [ ] B3 Airtable (needs HUMAN_STEPS 3)
 - [ ] A4 AWS (needs HUMAN_STEPS 4, after A3)

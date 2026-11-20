@@ -36,7 +36,7 @@ The temporary token expires in about 24 hours. When replies stop working with a 
 
 Claude will tell you when the local server is ready. Then:
 
-1. Terminal 1, in `D:\Project\Portfolio\tenant-desk`: start the server with the command from the README (`.venv\Scripts\python -m uvicorn app.webhook:app --port 8001`).
+1. Terminal 1, in `D:\Project\Portfolio\tenant-desk`: start the server: `.venv\Scripts\python -m app.webhook` (listens on http://127.0.0.1:8001).
 2. Terminal 2: `cloudflared tunnel --url http://localhost:8001`
 3. Copy the `https://....trycloudflare.com` URL it prints.
 4. Meta app -> **WhatsApp** -> **Configuration** -> **Webhook** -> **Edit**.
@@ -48,6 +48,16 @@ Claude will tell you when the local server is ready. Then:
 7. You should get a reply with a ticket number like `TD-0001`. Screenshot the WhatsApp chat (crop out your phone number) and tell Claude.
 
 The tunnel URL changes every time cloudflared restarts. Redo step 4 when it does.
+
+## Step 2b (optional, to see B2 in the n8n UI): local n8n owner account
+
+Only needed if you want to look at the workflows in the browser (for screenshots or a recording). The automated test does not need it.
+
+1. In `D:\Project\Portfolio\invoice-agent`: `docker compose up -d`, then `powershell -ExecutionPolicy Bypass -File scripts\n8n_setup.ps1`.
+2. Open http://localhost:5690. n8n asks you to set up an owner account. This account is stored only in the local Docker volume `invoice_agent_n8n_data`; it is not an n8n Cloud sign-up. Use any email and a new password (not one you use elsewhere). Skip/decline any "get a free license" or survey prompt.
+3. Open **Invoice intake** to see the flow. When finished: `docker compose down`.
+
+Do not open the old LendLoop instance (port 5678) for this project.
 
 ## Step 3 (before B3): Airtable base and token
 

@@ -77,6 +77,11 @@ class DuplicateChecker:
                 (key, file_id),
             )
 
+    def clear(self):
+        """Forget every stored key. Used by the demo reset."""
+        with self._connect() as conn:
+            conn.execute("DELETE FROM seen_invoices")
+
     def check(self, fields, file_id):
         """Check one invoice and remember it.
 

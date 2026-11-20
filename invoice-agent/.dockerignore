@@ -1,0 +1,14 @@
+# Keep secrets, local data and the virtualenv out of the image.
+.env
+.env.*
+.venv/
+data/
+outbox/
+inbox/
+n8n/
+synthetic/
+tests/
+docs/
+scripts/
+**/__pycache__/
+.pytest_cache/
