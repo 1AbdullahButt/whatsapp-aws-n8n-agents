@@ -1,0 +1,9 @@
+﻿pdfplumber
+pypdf
+reportlab
+fastapi
+uvicorn
+httpx
+pytest
+# FastAPI needs this to read multipart uploads on POST /extract
+python-multipart

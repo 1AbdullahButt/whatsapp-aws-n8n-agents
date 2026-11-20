@@ -29,8 +29,8 @@ cd invoice-agent && .venv\Scripts\python -m pytest -q
 ## Status (update after every milestone)
 - [x] Phase 0 plan approved (20 Nov 2026)
 - [x] Phase 1 repo setup
-- [ ] A1 local prototype
-- [ ] B1 local extraction
+- [x] A1 local prototype (59 tests green, commit 7d60bb3). Not run against real WhatsApp/Whisper/AWS yet.
+- [x] B1 local extraction (145 tests green; 99/108 fields correct on own synthetic set, the 9 misses are the image-only PDF, flagged no_text_layer)
 - [ ] A2 real WhatsApp text (needs HUMAN_STEPS 1-2)
 - [ ] B2 n8n end to end
 - [ ] A3 voice note + handoff on phone

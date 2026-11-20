@@ -1,0 +1,16 @@
+{
+  "_note": "MOCK DATA. Fake payment records for the synthetic invoices in synthetic/invoices. Not real accounting data.",
+  "invoices": {
+    "INV-2026-0141": {"status": "paid", "amount_paid": 357.80},
+    "KOG-77812": {"status": "unpaid", "amount_paid": 0.00},
+    "HP/2026/0093": {"status": "partial", "amount_paid": 200.00},
+    "SS-5521": {"status": "paid", "amount_paid": 5286.40},
+    "VQ-2026-0207": {"status": "unpaid", "amount_paid": 0.00},
+    "CIT-3009": {"status": "partial", "amount_paid": 500.00},
+    "MP-0456": {"status": "unpaid", "amount_paid": 0.00},
+    "TCS-1180": {"status": "paid", "amount_paid": 106.02},
+    "LDS-1102": {"status": "unpaid", "amount_paid": 0.00},
+    "INV-2026-0388": {"status": "unpaid", "amount_paid": 0.00},
+    "OLH-0712": {"status": "unpaid", "amount_paid": 0.00}
+  }
+}

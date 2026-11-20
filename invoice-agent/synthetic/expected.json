@@ -1,0 +1,406 @@
+{
+  "inv_01_classic_usd.pdf": {
+    "layout": "classic",
+    "fields": {
+      "vendor": "Bluefinch Paper Supplies LLC",
+      "invoice_number": "INV-2026-0141",
+      "invoice_date": "2026-10-03",
+      "due_date": "2026-11-02",
+      "currency": "USD",
+      "line_items": [
+        {
+          "description": "A4 copy paper (box)",
+          "qty": 10,
+          "unit_price": 24.5,
+          "amount": 245.0
+        },
+        {
+          "description": "Heavy duty stapler",
+          "qty": 2,
+          "unit_price": 18.75,
+          "amount": 37.5
+        },
+        {
+          "description": "Ballpoint pens (pack of 50)",
+          "qty": 4,
+          "unit_price": 12.2,
+          "amount": 48.8
+        }
+      ],
+      "subtotal": 331.3,
+      "tax": 26.5,
+      "total": 357.8
+    },
+    "expected_flags": [],
+    "duplicate_of": null,
+    "note": ""
+  },
+  "inv_02_twocol_eur.pdf": {
+    "layout": "twocol",
+    "fields": {
+      "vendor": "Kestrel Office Goods GmbH",
+      "invoice_number": "KOG-77812",
+      "invoice_date": "2026-10-03",
+      "due_date": "2026-11-02",
+      "currency": "EUR",
+      "line_items": [
+        {
+          "description": "Ergonomic desk chair",
+          "qty": 3,
+          "unit_price": 189.0,
+          "amount": 567.0
+        },
+        {
+          "description": "Monitor arm",
+          "qty": 3,
+          "unit_price": 64.9,
+          "amount": 194.7
+        }
+      ],
+      "subtotal": 761.7,
+      "tax": 144.72,
+      "total": 906.42
+    },
+    "expected_flags": [],
+    "duplicate_of": null,
+    "note": ""
+  },
+  "inv_03_labelright_gbp.pdf": {
+    "layout": "labelright",
+    "fields": {
+      "vendor": "Harbourline Print Ltd",
+      "invoice_number": "HP/2026/0093",
+      "invoice_date": "2026-10-03",
+      "due_date": "2026-11-02",
+      "currency": "GBP",
+      "line_items": [
+        {
+          "description": "Business cards (500)",
+          "qty": 6,
+          "unit_price": 35.0,
+          "amount": 210.0
+        },
+        {
+          "description": "A2 posters",
+          "qty": 20,
+          "unit_price": 6.5,
+          "amount": 130.0
+        },
+        {
+          "description": "Design proof",
+          "qty": 1,
+          "unit_price": 45.0,
+          "amount": 45.0
+        }
+      ],
+      "subtotal": 385.0,
+      "tax": 77.0,
+      "total": 462.0
+    },
+    "expected_flags": [],
+    "duplicate_of": null,
+    "note": ""
+  },
+  "inv_04_receipt_pkr.pdf": {
+    "layout": "receipt",
+    "fields": {
+      "vendor": "Shalimar Stationers (Pvt) Ltd",
+      "invoice_number": "SS-5521",
+      "invoice_date": "2026-10-15",
+      "due_date": "2026-10-28",
+      "currency": "PKR",
+      "line_items": [
+        {
+          "description": "Notebook A5",
+          "qty": 12,
+          "unit_price": 150.0,
+          "amount": 1800.0
+        },
+        {
+          "description": "Gel pen blue",
+          "qty": 24,
+          "unit_price": 45.0,
+          "amount": 1080.0
+        },
+        {
+          "description": "Box file",
+          "qty": 5,
+          "unit_price": 320.0,
+          "amount": 1600.0
+        }
+      ],
+      "subtotal": 4480.0,
+      "tax": 806.4,
+      "total": 5286.4
+    },
+    "expected_flags": [],
+    "duplicate_of": null,
+    "note": ""
+  },
+  "inv_05_classic_eur.pdf": {
+    "layout": "classic",
+    "fields": {
+      "vendor": "Vellum and Quill Supplies SARL",
+      "invoice_number": "VQ-2026-0207",
+      "invoice_date": "2026-10-21",
+      "due_date": "2026-11-20",
+      "currency": "EUR",
+      "line_items": [
+        {
+          "description": "Fountain pen ink (set)",
+          "qty": 8,
+          "unit_price": 14.25,
+          "amount": 114.0
+        },
+        {
+          "description": "Letter paper ream",
+          "qty": 15,
+          "unit_price": 9.8,
+          "amount": 147.0
+        }
+      ],
+      "subtotal": 261.0,
+      "tax": 52.2,
+      "total": 313.2
+    },
+    "expected_flags": [],
+    "duplicate_of": null,
+    "note": ""
+  },
+  "inv_06_twocol_usd.pdf": {
+    "layout": "twocol",
+    "fields": {
+      "vendor": "Copperleaf IT Services Inc",
+      "invoice_number": "CIT-3009",
+      "invoice_date": "2026-11-07",
+      "due_date": "2026-12-07",
+      "currency": "USD",
+      "line_items": [
+        {
+          "description": "Laptop setup (hours)",
+          "qty": 6,
+          "unit_price": 85.0,
+          "amount": 510.0
+        },
+        {
+          "description": "USB-C docking station",
+          "qty": 2,
+          "unit_price": 149.99,
+          "amount": 299.98
+        },
+        {
+          "description": "Network cable 5m",
+          "qty": 10,
+          "unit_price": 7.45,
+          "amount": 74.5
+        }
+      ],
+      "subtotal": 884.48,
+      "tax": 0.0,
+      "total": 884.48
+    },
+    "expected_flags": [],
+    "duplicate_of": null,
+    "note": ""
+  },
+  "inv_07_labelright_pkr.pdf": {
+    "layout": "labelright",
+    "fields": {
+      "vendor": "Margalla Packaging Co",
+      "invoice_number": "MP-0456",
+      "invoice_date": "2026-10-12",
+      "due_date": "2026-11-11",
+      "currency": "PKR",
+      "line_items": [
+        {
+          "description": "Corrugated boxes (large)",
+          "qty": 200,
+          "unit_price": 85.0,
+          "amount": 17000.0
+        },
+        {
+          "description": "Packing tape roll",
+          "qty": 40,
+          "unit_price": 120.0,
+          "amount": 4800.0
+        }
+      ],
+      "subtotal": 21800.0,
+      "tax": 3706.0,
+      "total": 25506.0
+    },
+    "expected_flags": [],
+    "duplicate_of": null,
+    "note": ""
+  },
+  "inv_08_receipt_gbp.pdf": {
+    "layout": "receipt",
+    "fields": {
+      "vendor": "Thistle Catering Supplies Ltd",
+      "invoice_number": "TCS-1180",
+      "invoice_date": "2026-11-05",
+      "due_date": "2026-11-19",
+      "currency": "GBP",
+      "line_items": [
+        {
+          "description": "Paper cups (100)",
+          "qty": 6,
+          "unit_price": 4.8,
+          "amount": 28.8
+        },
+        {
+          "description": "Napkins (500)",
+          "qty": 3,
+          "unit_price": 7.25,
+          "amount": 21.75
+        },
+        {
+          "description": "Coffee beans 1kg",
+          "qty": 2,
+          "unit_price": 18.9,
+          "amount": 37.8
+        }
+      ],
+      "subtotal": 88.35,
+      "tax": 17.67,
+      "total": 106.02
+    },
+    "expected_flags": [],
+    "duplicate_of": null,
+    "note": ""
+  },
+  "inv_09_resent_copy.pdf": {
+    "layout": "classic",
+    "fields": {
+      "vendor": "Bluefinch Paper Supplies LLC",
+      "invoice_number": "INV-2026-0141",
+      "invoice_date": "2026-10-03",
+      "due_date": "2026-11-02",
+      "currency": "USD",
+      "line_items": [
+        {
+          "description": "A4 copy paper (box)",
+          "qty": 10,
+          "unit_price": 24.5,
+          "amount": 245.0
+        },
+        {
+          "description": "Heavy duty stapler",
+          "qty": 2,
+          "unit_price": 18.75,
+          "amount": 37.5
+        },
+        {
+          "description": "Ballpoint pens (pack of 50)",
+          "qty": 4,
+          "unit_price": 12.2,
+          "amount": 48.8
+        }
+      ],
+      "subtotal": 331.3,
+      "tax": 26.5,
+      "total": 357.8
+    },
+    "expected_flags": [],
+    "duplicate_of": "inv_01_classic_usd.pdf",
+    "note": ""
+  },
+  "inv_10_no_due_date.pdf": {
+    "layout": "twocol",
+    "fields": {
+      "vendor": "Larkspur Design Studio Ltd",
+      "invoice_number": "LDS-1102",
+      "invoice_date": "2026-11-01",
+      "due_date": null,
+      "currency": "GBP",
+      "line_items": [
+        {
+          "description": "Logo refresh",
+          "qty": 1,
+          "unit_price": 650.0,
+          "amount": 650.0
+        },
+        {
+          "description": "Brand guide pages",
+          "qty": 12,
+          "unit_price": 40.0,
+          "amount": 480.0
+        }
+      ],
+      "subtotal": 1130.0,
+      "tax": 226.0,
+      "total": 1356.0
+    },
+    "expected_flags": [
+      "missing_due_date"
+    ],
+    "duplicate_of": null,
+    "note": ""
+  },
+  "inv_11_malformed.pdf": {
+    "layout": "malformed",
+    "fields": {
+      "vendor": "Pinewood Janitorial Supplies LLC",
+      "invoice_number": "INV-2026-0388",
+      "invoice_date": "2026-10-20",
+      "due_date": "2026-11-19",
+      "currency": "USD",
+      "line_items": [
+        {
+          "description": "Floor cleaner 5L",
+          "qty": 4,
+          "unit_price": 22.0,
+          "amount": 88.0
+        },
+        {
+          "description": "Microfibre cloths (20)",
+          "qty": 3,
+          "unit_price": 15.5,
+          "amount": 46.5
+        }
+      ],
+      "subtotal": null,
+      "tax": null,
+      "total": null
+    },
+    "expected_flags": [
+      "missing_subtotal",
+      "missing_tax",
+      "missing_total"
+    ],
+    "duplicate_of": null,
+    "note": "Table cut off after two rows; total printed as '##.#?'."
+  },
+  "inv_12_image_only.pdf": {
+    "layout": "image",
+    "fields": {
+      "vendor": "Ostler Lane Hardware Ltd",
+      "invoice_number": "OLH-0712",
+      "invoice_date": "2026-10-28",
+      "due_date": "2026-11-27",
+      "currency": "GBP",
+      "line_items": [
+        {
+          "description": "Hinge set",
+          "qty": 10,
+          "unit_price": 3.4,
+          "amount": 34.0
+        },
+        {
+          "description": "Wood screws (box)",
+          "qty": 5,
+          "unit_price": 6.1,
+          "amount": 30.5
+        }
+      ],
+      "subtotal": 64.5,
+      "tax": 12.9,
+      "total": 77.4
+    },
+    "expected_flags": [
+      "no_text_layer"
+    ],
+    "duplicate_of": null,
+    "note": "Rasterised page with no text layer. Values are what the picture shows."
+  }
+}
