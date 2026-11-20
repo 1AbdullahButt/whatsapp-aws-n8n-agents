@@ -308,3 +308,11 @@ from the error workflow in `Error Log`.
 - Rows removed locally (for example after `/demo/reset`) are not deleted from Airtable.
   Draft ids restart at 1 after a reset, so `draft-1` is overwritten by the next run's draft 1.
 - Only the 12 synthetic invoices, one base, one user.
+
+## B4: extraction on AWS (written, not deployed)
+
+`cloud/extract_worker.py` and `aws/template.yaml`: a PDF uploaded to S3 triggers an S3 event to
+SQS (with a dead-letter queue after 3 tries), and a Lambda runs the same extractor into DynamoDB.
+Tested only against moto so far (8 tests; same 99/108 field accuracy after the DynamoDB round
+trip); nothing has been deployed. Resource list, deploy, demo and teardown: `aws/README.md`.
+Whole suite: `193 passed`.

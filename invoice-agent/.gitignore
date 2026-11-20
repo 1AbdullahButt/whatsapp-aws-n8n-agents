@@ -1,2 +1,5 @@
 # PDFs copied into the inbox by scripts/run_inbox.py (the originals live in synthetic/invoices)
 inbox/*.pdf
+
+# Lambda package made by aws/build.py
+aws/build/

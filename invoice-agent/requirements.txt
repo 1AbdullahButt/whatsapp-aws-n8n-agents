@@ -7,3 +7,7 @@ httpx
 pytest
 # FastAPI needs this to read multipart uploads on POST /extract
 python-multipart
+# B4 (AWS) code and its moto tests; cfn-lint checks aws/template.yaml. Not needed by the local app.
+boto3
+moto[dynamodb,s3,sqs]
+cfn-lint

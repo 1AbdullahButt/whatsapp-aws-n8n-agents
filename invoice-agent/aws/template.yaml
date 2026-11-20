@@ -1,0 +1,116 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  invoice-agent B4 (portfolio demo): PDF uploaded to S3 -> SQS (+ dead-letter
+  queue) -> Lambda running the local pdfplumber extractor -> DynamoDB.
+  No Textract. Deploy only after the budget check, remove with aws/teardown.ps1.
+
+Resources:
+  InvoicesTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Delete
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - { AttributeName: pk, AttributeType: S }
+        - { AttributeName: sk, AttributeType: S }
+      KeySchema:
+        - { AttributeName: pk, KeyType: HASH }
+        - { AttributeName: sk, KeyType: RANGE }
+
+  DeadLetterQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      MessageRetentionPeriod: 345600   # 4 days
+
+  UploadQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      VisibilityTimeout: 360           # 6 x the worker timeout, as AWS recommends
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt DeadLetterQueue.Arn
+        maxReceiveCount: 3
+
+  # Lets S3 (only for our bucket, only in this account) put events on the queue.
+  UploadQueuePolicy:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      Queues: [!Ref UploadQueue]
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal: { Service: s3.amazonaws.com }
+            Action: sqs:SendMessage
+            Resource: !GetAtt UploadQueue.Arn
+            Condition:
+              ArnLike: { "aws:SourceArn": !Sub "arn:aws:s3:::${AWS::StackName}-inbox-${AWS::AccountId}" }
+              StringEquals: { "aws:SourceAccount": !Ref AWS::AccountId }
+
+  InboxBucket:
+    Type: AWS::S3::Bucket
+    DependsOn: UploadQueuePolicy       # S3 tests the queue permission when the bucket is created
+    DeletionPolicy: Delete
+    Properties:
+      BucketName: !Sub "${AWS::StackName}-inbox-${AWS::AccountId}"   # fixed name avoids a circular reference
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      LifecycleConfiguration:
+        Rules:
+          - Id: delete-uploads-after-7-days
+            Status: Enabled
+            ExpirationInDays: 7
+      NotificationConfiguration:
+        QueueConfigurations:
+          - Event: s3:ObjectCreated:*
+            Queue: !GetAtt UploadQueue.Arn
+            Filter:
+              S3Key:
+                Rules:
+                  - { Name: suffix, Value: .pdf }
+
+  ExtractFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: python3.12
+      Architectures: [x86_64]
+      CodeUri: build/
+      Handler: cloud.extract_worker.handler
+      Description: Extracts invoice fields from an uploaded PDF into DynamoDB
+      MemorySize: 512
+      Timeout: 60
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref InvoicesTable
+      Events:
+        Uploads:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt UploadQueue.Arn
+            BatchSize: 1
+            FunctionResponseTypes: [ReportBatchItemFailures]
+            ScalingConfig:
+              MaximumConcurrency: 2
+      Policies:
+        - S3ReadPolicy: { BucketName: !Sub "${AWS::StackName}-inbox-${AWS::AccountId}" }
+        - DynamoDBCrudPolicy: { TableName: !Ref InvoicesTable }
+
+  ExtractLogs:
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Delete
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/${ExtractFunction}"
+      RetentionInDays: 7
+
+Outputs:
+  InboxBucketName:
+    Value: !Ref InboxBucket
+  UploadQueueUrl:
+    Value: !Ref UploadQueue
+  DeadLetterQueueUrl:
+    Value: !Ref DeadLetterQueue
+  TableName:
+    Value: !Ref InvoicesTable
