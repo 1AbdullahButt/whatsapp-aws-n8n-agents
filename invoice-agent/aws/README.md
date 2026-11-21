@@ -13,7 +13,7 @@ PDF uploaded to the inbox bucket
 No Textract (not on the AWS Free plan); the B1 extractor is pure Python and runs in Lambda as is.
 This leg covers extraction only. The n8n approval flow and Airtable stay local (B2, B3).
 
-## What `deploy.ps1` would create (us-east-1)
+## What `deploy.ps1` would create (ap-southeast-2)
 
 | Resource | Count | Settings that limit cost |
 |---|---|---|

@@ -21,7 +21,7 @@ from app.transcriber import FasterWhisperTranscriber  # noqa: E402
 from cloud.pending import transcribe_pending          # noqa: E402
 
 STACK = "tenant-desk-a4"
-REGION = "us-east-1"
+REGION = "ap-southeast-2"
 
 
 def main():

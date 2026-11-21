@@ -33,7 +33,7 @@ def put_all(ssm, values):
 def main():
     load_env(TENANT_DESK / ".env")
     values = {env_name: require(env_name).strip() for env_name in SECRETS.values()}
-    put_all(boto3.client("ssm", region_name="us-east-1"), values)
+    put_all(boto3.client("ssm", region_name="ap-southeast-2"), values)
 
 
 if __name__ == "__main__":

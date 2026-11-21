@@ -1,9 +1,9 @@
 # Remove everything B4 created, then check nothing is left.
 #   powershell -ExecutionPolicy Bypass -File aws\teardown.ps1
-# Safe to run twice. Region us-east-1.
+# Safe to run twice. Region ap-southeast-2.
 
 $ErrorActionPreference = "Continue"
-$Region = "us-east-1"
+$Region = "ap-southeast-2"
 $Stack = "invoice-agent-b4"
 
 Write-Host "1. Empty the inbox bucket (CloudFormation cannot delete a bucket that has files)"

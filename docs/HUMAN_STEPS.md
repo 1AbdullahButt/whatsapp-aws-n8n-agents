@@ -81,7 +81,7 @@ Do this only when you are ready to start A4: the Free plan's 6-month clock start
 
 1. https://aws.amazon.com -> **Create an AWS account**. Use an email you check. When asked for a plan, choose **Free plan** (credits, cannot be billed, account is suspended at the end instead of charged).
 2. Sign in as the root user -> top right account menu -> **Security credentials** -> **Assign MFA device** -> authenticator app. Root is used only for billing and emergencies after this.
-3. Region: top right, pick **US East (N. Virginia) us-east-1** and keep it for both projects.
+3. Region: top right, pick **Asia Pacific (Sydney) ap-southeast-2** and keep it for both projects (this account is region-locked to Sydney by an organization policy; us-east-1 is denied).
 4. Budgets (before anything is deployed): **Billing and Cost Management** -> **Budgets** -> **Create budget** -> **Use a template** -> **Zero spend budget**, your email. Then a second one: **Monthly cost budget**, amount **$1**, alerts at 50%, 80%, 100%. Tell Claude when both show in the list; Claude will ask for a screenshot of the Budgets list (no account number visible).
 5. IAM user for deploys: **IAM** -> **Users** -> **Create user** `portfolio-deployer`, no console access. Permissions: **Attach policies directly** -> `AdministratorAccess` (simplest for a short demo; Claude will list exactly what SAM creates before each deploy). Then the user -> **Security credentials** -> **Create access key** -> **Command Line Interface (CLI)** -> tick the confirmation -> copy the two values. Do not paste them in chat.
 6. Install the tools in a terminal:
@@ -89,7 +89,7 @@ Do this only when you are ready to start A4: the Free plan's 6-month clock start
    winget install Amazon.AWSCLI
    winget install Amazon.SAM-CLI
    ```
-   Close and reopen the terminal, then `aws configure`: paste the access key id and secret, region `us-east-1`, output `json`. This stores them in `%USERPROFILE%\.aws\credentials`, outside the repo.
+   Close and reopen the terminal, then `aws configure`: paste the access key id and secret, region `ap-southeast-2`, output `json`. This stores them in `%USERPROFILE%\.aws\credentials`, outside the repo.
 7. Check: `aws sts get-caller-identity` prints a user ARN ending in `portfolio-deployer`. Tell Claude "AWS ready".
 
 After the demo Claude gives you `sam delete` commands and you delete the access key in IAM (step 5 screen -> **Deactivate** -> **Delete**).

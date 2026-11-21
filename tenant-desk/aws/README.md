@@ -17,7 +17,7 @@ AWS Transcribe is not on the Free plan, so voice notes are transcribed on the PC
 The worker reuses `app/service.py`, `app/repo_dynamodb.py` and `app/whatsapp_client.py`
 (templates blocked) unchanged; only the media saver and transcriber are swapped.
 
-## What `deploy.ps1` would create (all in us-east-1)
+## What `deploy.ps1` would create (all in ap-southeast-2)
 
 | Resource | Count | Settings that limit cost |
 |---|---|---|

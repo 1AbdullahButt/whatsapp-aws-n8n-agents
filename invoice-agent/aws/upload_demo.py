@@ -16,7 +16,7 @@ PROJECT = Path(__file__).resolve().parents[1]
 INVOICE_DIR = PROJECT / "synthetic" / "invoices"
 EXPECTED = json.loads((PROJECT / "synthetic" / "expected.json").read_text(encoding="utf-8"))
 STACK = "invoice-agent-b4"
-REGION = "us-east-1"
+REGION = "ap-southeast-2"
 FIELDS = ["vendor", "invoice_number", "invoice_date", "due_date", "currency", "subtotal", "tax", "total", "line_items"]
 
 

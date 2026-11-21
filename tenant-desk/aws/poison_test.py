@@ -21,7 +21,7 @@ def stack_outputs(cloudformation):
 
 
 def main():
-    region = "us-east-1"
+    region = "ap-southeast-2"
     outputs = stack_outputs(boto3.client("cloudformation", region_name=region))
     sqs = boto3.client("sqs", region_name=region)
     sqs.send_message(QueueUrl=outputs["QueueUrl"], MessageBody=POISON_BODY)

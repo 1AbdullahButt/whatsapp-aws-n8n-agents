@@ -12,7 +12,7 @@ import time
 import boto3
 
 STACK = "invoice-agent-b4"
-REGION = "us-east-1"
+REGION = "ap-southeast-2"
 KEY = "poison_not_a_pdf.pdf"
 
 

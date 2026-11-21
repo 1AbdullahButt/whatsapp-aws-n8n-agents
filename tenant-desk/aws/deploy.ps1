@@ -4,7 +4,7 @@
 
 $ErrorActionPreference = "Stop"
 $Stack = "tenant-desk-a4"
-$Region = "us-east-1"
+$Region = "ap-southeast-2"
 
 # The venv's Python 3.12 must come first on PATH, because the Lambda runtime is python3.12
 # and plain `python` on this PC is 3.10.

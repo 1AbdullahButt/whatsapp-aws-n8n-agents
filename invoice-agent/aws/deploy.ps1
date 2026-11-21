@@ -4,7 +4,7 @@
 
 $ErrorActionPreference = "Stop"
 $Stack = "invoice-agent-b4"
-$Region = "us-east-1"
+$Region = "ap-southeast-2"
 
 # The venv's Python 3.12 must come first on PATH (Lambda runtime python3.12; plain `python` here is 3.10).
 $env:PATH = "$PWD\.venv\Scripts;$env:PATH"

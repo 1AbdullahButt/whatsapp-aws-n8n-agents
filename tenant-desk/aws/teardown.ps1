@@ -1,9 +1,9 @@
 # Remove everything A4 created, then check nothing is left.
 #   powershell -ExecutionPolicy Bypass -File aws\teardown.ps1
-# Safe to run twice. Uses your `aws configure` credentials, region us-east-1.
+# Safe to run twice. Uses your `aws configure` credentials, region ap-southeast-2.
 
 $ErrorActionPreference = "Continue"
-$Region = "us-east-1"
+$Region = "ap-southeast-2"
 $Stack = "tenant-desk-a4"
 
 Write-Host "1. Empty the voice-note bucket (CloudFormation cannot delete a bucket that has files)"
