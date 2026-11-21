@@ -82,7 +82,7 @@ Resources:
           QUEUE_URL: !Ref MessageQueue
       Policies:
         - SQSSendMessagePolicy: { QueueName: !GetAtt MessageQueue.QueueName }
-        - SSMParameterReadPolicy: { ParameterName: !Sub "${ParamPrefix}/*" }
+        - SSMParameterWithSlashPrefixReadPolicy: { ParameterName: !Sub "${ParamPrefix}/*" }
 
   WorkerFunction:
     Type: AWS::Serverless::Function
@@ -106,7 +106,7 @@ Resources:
       Policies:
         - DynamoDBCrudPolicy: { TableName: !Ref TicketsTable }
         - S3CrudPolicy: { BucketName: !Ref MediaBucket }
-        - SSMParameterReadPolicy: { ParameterName: !Sub "${ParamPrefix}/*" }
+        - SSMParameterWithSlashPrefixReadPolicy: { ParameterName: !Sub "${ParamPrefix}/*" }
 
   WebhookLogs:
     Type: AWS::Logs::LogGroup

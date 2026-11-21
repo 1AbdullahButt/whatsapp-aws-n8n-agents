@@ -1,6 +1,7 @@
 """A4 Lambda handlers against moto (fake AWS in memory). No AWS account is used."""
 import base64
 import json
+from pathlib import Path
 from datetime import timedelta
 
 import boto3
@@ -197,3 +198,11 @@ def test_transcribe_pending_fills_text_and_updates_ticket(deps):
     assert deps["repo"].get_history("TD-0001")[0].text == "I can smell gas in the kitchen"
     # Running again finds nothing left to do.
     assert pending.transcribe_pending(deps["repo"], boto3.client("s3", region_name=REGION), fake, NOW) == []
+
+
+def test_ssm_policy_matches_parameter_names_that_start_with_a_slash():
+    """SSMParameterReadPolicy adds its own '/', so '/tenant-desk/*' became 'parameter//tenant-desk/*'
+    and the deployed Lambdas got AccessDenied (seen on real AWS, 21 Nov 2026)."""
+    template = (Path(__file__).resolve().parents[1] / "aws" / "template.yaml").read_text(encoding="utf-8")
+    assert "SSMParameterReadPolicy" not in template
+    assert template.count("SSMParameterWithSlashPrefixReadPolicy") == 2
