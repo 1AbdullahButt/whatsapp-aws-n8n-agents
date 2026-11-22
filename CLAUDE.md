@@ -37,6 +37,7 @@ cd invoice-agent && .venv\Scripts\python -m pytest -q
 - [x] B3 Airtable (21 Nov 2026; scripts/sync_airtable.py, upsert; fresh n8n e2e 11/11 then 12 invoices + 3 drafts + 1 error in the base; 14 API calls used; 185 tests)
 - [x] B4 AWS (21 Nov 2026, ap-southeast-2): deployed, 12 PDFs -> 99/108 (same as local), duplicate/needs_review flags right, poison PDF -> DLQ after 3 tries; torn down. 193 tests.
 - [x] A4 AWS (21-22 Nov 2026, ap-southeast-2): deployed, text -> ticket -> reply and voice note -> S3 + pending -> PC transcription on the phone, poison -> DLQ; torn down. Fixed SSM slash policy + 5-min secret refresh (81 tests). Gaps: failed reply not resent after dedupe, INFO logs not in CloudWatch.
+- [x] Portfolio summary (23 Nov 2026): docs/PORTFOLIO_SUMMARY.md; AWS screenshots committed (019b3e3).
 - [ ] A5 pilot
 - [ ] B5 optional RAG
 
