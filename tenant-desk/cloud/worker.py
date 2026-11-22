@@ -9,6 +9,7 @@ helps when the failure happens before that, for example a body that is not
 valid JSON or a DynamoDB outage. A failed reply after mark_seen is not resent.
 """
 import json
+import time
 from datetime import datetime, timezone
 
 import boto3
@@ -80,10 +81,14 @@ def handle_event(event, deps, now=None):
 
 
 _deps = None
+_deps_built_at = 0.0
 
 
-def handler(event, context=None):
-    global _deps
-    if _deps is None:
-        _deps = build_deps()   # once per container, reused while it stays warm
+def handler(event, context=None, clock=time.monotonic):
+    """Reuse the clients while the container is warm, but rebuild them every
+    CACHE_SECONDS so a refreshed WhatsApp token in SSM is picked up."""
+    global _deps, _deps_built_at
+    if _deps is None or clock() - _deps_built_at >= settings.CACHE_SECONDS:
+        _deps = build_deps()
+        _deps_built_at = clock()
     return handle_event(event, _deps)

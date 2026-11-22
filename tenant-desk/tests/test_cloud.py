@@ -42,7 +42,7 @@ def aws(monkeypatch):
                         "AWS_SESSION_TOKEN": "testing", "AWS_DEFAULT_REGION": REGION,
                         "AWS_REGION": REGION}.items():
         monkeypatch.setenv(name, value)
-    settings.secret.cache_clear()
+    settings.clear_cache()
     with mock_aws():
         ssm = boto3.client("ssm", region_name=REGION)
         for name, value in (("app-secret", SECRET), ("verify-token", VERIFY), ("whatsapp-token", "tok")):
@@ -60,7 +60,7 @@ def aws(monkeypatch):
                                   {"AttributeName": "sk", "AttributeType": "S"}])
         boto3.client("s3", region_name=REGION).create_bucket(Bucket="media-bucket")
         yield {"queue_url": queue_url}
-    settings.secret.cache_clear()
+    settings.clear_cache()
 
 
 @pytest.fixture
@@ -206,3 +206,25 @@ def test_ssm_policy_matches_parameter_names_that_start_with_a_slash():
     template = (Path(__file__).resolve().parents[1] / "aws" / "template.yaml").read_text(encoding="utf-8")
     assert "SSMParameterReadPolicy" not in template
     assert template.count("SSMParameterWithSlashPrefixReadPolicy") == 2
+
+
+def test_secret_is_cached_then_reread_after_five_minutes(aws):
+    """A new token stored by put_secrets.py reaches a warm Lambda (the token expired on real AWS)."""
+    clock = [1000.0]
+    assert settings.secret("whatsapp_token", clock=lambda: clock[0]) == "tok"
+    boto3.client("ssm", region_name=REGION).put_parameter(
+        Name="/tenant-desk/whatsapp-token", Value="new-tok", Type="SecureString", Overwrite=True)
+    clock[0] += 60
+    assert settings.secret("whatsapp_token", clock=lambda: clock[0]) == "tok"
+    clock[0] += settings.CACHE_SECONDS
+    assert settings.secret("whatsapp_token", clock=lambda: clock[0]) == "new-tok"
+
+
+def test_worker_rebuilds_its_clients_after_five_minutes(monkeypatch):
+    built = []
+    monkeypatch.setattr(worker, "build_deps", lambda: built.append(1) or {"n": len(built)})
+    monkeypatch.setattr(worker, "handle_event", lambda event, deps: deps["n"])
+    monkeypatch.setattr(worker, "_deps", None)
+    assert worker.handler({}, clock=lambda: 0.0) == 1
+    assert worker.handler({}, clock=lambda: 100.0) == 1
+    assert worker.handler({}, clock=lambda: float(settings.CACHE_SECONDS)) == 2
