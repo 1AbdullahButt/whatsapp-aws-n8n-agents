@@ -1,6 +1,6 @@
 # A4: tenant-desk on AWS (SAM)
 
-Status (21 Nov 2026): **written and tested locally against moto only. Not deployed. No AWS account yet.**
+Status (22 Nov 2026): **deployed once to real AWS (ap-southeast-2, Free plan), demoed with a real phone, then torn down the same day.** Results below under "What ran on real AWS". Nothing is running now.
 
 ```
 Meta --POST--> Lambda function URL (cloud/webhook.py)
@@ -17,7 +17,7 @@ AWS Transcribe is not on the Free plan, so voice notes are transcribed on the PC
 The worker reuses `app/service.py`, `app/repo_dynamodb.py` and `app/whatsapp_client.py`
 (templates blocked) unchanged; only the media saver and transcriber are swapped.
 
-## What `deploy.ps1` would create (all in ap-southeast-2)
+## What `deploy.ps1` creates (all in ap-southeast-2)
 
 | Resource | Count | Settings that limit cost |
 |---|---|---|
@@ -46,7 +46,8 @@ powershell -ExecutionPolicy Bypass -File aws\deploy.ps1
 
 `deploy.ps1` reads the phone number ID from `.env`, builds `aws/build/` (app, cloud, shared,
 `httpx`), runs `sam build`, then `sam deploy --confirm-changeset`: SAM lists every resource and
-waits for `y`. Afterwards set the Meta callback URL to the `WebhookUrl` output + `webhook`.
+waits for `y`. (On 21 Nov the resource list was approved in advance, so it ran with
+`--no-confirm-changeset`.) Afterwards set the Meta callback URL to the `WebhookUrl` output + `webhook`.
 
 Demo checks after deploy:
 1. Text from the phone -> reply with a ticket number (worker logs in CloudWatch).
@@ -78,9 +79,40 @@ remove SAM's artifact stack: `sam delete --stack-name aws-sam-cli-managed-defaul
 - `put_secrets.py` writes SecureStrings; `build.py` output has the Lambda code and no server, `.env` or venv.
 - `cfn-lint aws/template.yaml`: no errors.
 
-## Not tested yet
+## What ran on real AWS (21-22 Nov 2026)
 
-- Nothing has run on real AWS: no deploy, no real SQS redrive, no CloudWatch logs, no IAM policy check.
-- `sam build` / `sam deploy` have not been run (SAM CLI not installed yet).
-- moto does not enforce IAM or the 3-receive redrive, so the DLQ path is only proven by the
-  `batchItemFailures` unit test until `poison_test.py` runs on the real stack.
+One deploy plus two stack updates, all in ap-southeast-2. The WhatsApp test number is the one
+from A2 ("Tenant Desk Demo 2"); messages came from Abdullah's own phone.
+
+| Check | Result |
+|---|---|
+| Verify GET with the right / wrong token, POST with a bad signature | 200 + challenge / 403 / 401 |
+| Text message | queued, worker created the ticket, plain-text reply on the phone about 7 s after sending (cold start) |
+| Voice note | `.ogg` (about 10 KB) stored in S3, ticket line `[voice note - transcription pending]`, reply on the phone |
+| `transcribe_pending.py` on the PC | downloaded the audio from S3, faster-whisper `base` wrote "My boiler is broken. There is no hot water." back into DynamoDB |
+| `poison_test.py` (body that is not JSON) | failed at receive counts 1, 2, 3 (one minute apart, `JSONDecodeError` in CloudWatch), then found in the dead-letter queue and deleted |
+| Duplicate protection | one `WAMSG#` row per WhatsApp message id in DynamoDB |
+| Teardown | `teardown.ps1` + SAM artifact stack removed; stacks, buckets, functions, queues, tables, log groups, SSM parameters and stack roles all listed empty |
+| Cost | both budgets at $0.00; Free plan credits $159.999667 remaining after teardown |
+
+Two bugs found only on real AWS, both fixed with a test (see `docs/DECISIONS.md` 18 and 19):
+1. `SSMParameterReadPolicy` adds its own `/`, so `/tenant-desk/*` became `parameter//tenant-desk/*`
+   and every secret read got AccessDenied (webhook answered 502). Now
+   `SSMParameterWithSlashPrefixReadPolicy`.
+2. The temporary WhatsApp token stopped working about 80 minutes after it was made, and the warm
+   Lambda kept the old token forever. Secrets and clients are now re-read every 5 minutes, so a
+   new token from `put_secrets.py` arrives without a redeploy.
+
+## Still not proven / known gaps
+
+- **A failed reply is not resent.** Dedupe (`mark_seen`) runs before the reply, so when the reply
+  failed (expired token) the SQS retry did nothing and that message never got an answer. Retries only
+  help for failures before dedupe (bad body, DynamoDB down).
+- Only WARNING and ERROR lines reach CloudWatch; the worker's INFO lines (ticket id per message) do not.
+- Voice notes are not transcribed in the cloud (Transcribe is not on the Free plan); someone has to
+  run `transcribe_pending.py`.
+- The ticket category is only changed by a transcript when it was `other`, so TD-0001 stayed
+  `plumbing` after the boiler voice note.
+- "Water on the floor" is still not classed as urgent (gap from A3).
+- One tenant, a few messages, a test number with temporary tokens. No load test, no permanent token,
+  no real tenants.

@@ -309,10 +309,12 @@ from the error workflow in `Error Log`.
   Draft ids restart at 1 after a reset, so `draft-1` is overwritten by the next run's draft 1.
 - Only the 12 synthetic invoices, one base, one user.
 
-## B4: extraction on AWS (written, not deployed)
+## B4: extraction on AWS (deployed once, then torn down)
 
 `cloud/extract_worker.py` and `aws/template.yaml`: a PDF uploaded to S3 triggers an S3 event to
 SQS (with a dead-letter queue after 3 tries), and a Lambda runs the same extractor into DynamoDB.
-Tested only against moto so far (8 tests; same 99/108 field accuracy after the DynamoDB round
-trip); nothing has been deployed. Resource list, deploy, demo and teardown: `aws/README.md`.
+Tested against moto (8 tests), then deployed once to real AWS (ap-southeast-2, Free plan,
+21 Nov 2026): all 12 synthetic PDFs processed, **99/108 fields correct, the same as locally**,
+duplicate and needs_review flags as expected, a broken PDF reached the dead-letter queue after
+3 tries, $0.00 spent, stack deleted the same day. Resource list, deploy, demo and teardown: `aws/README.md`.
 Whole suite: `193 passed`.

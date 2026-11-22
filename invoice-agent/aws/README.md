@@ -1,6 +1,6 @@
 # B4: invoice extraction on AWS (SAM)
 
-Status (21 Nov 2026): **written and tested locally against moto only. Not deployed. No AWS account yet.**
+Status (22 Nov 2026): **deployed once to real AWS (ap-southeast-2, Free plan), demoed with the 12 synthetic PDFs, then torn down.** Results under "What ran on real AWS". Nothing is running now.
 
 ```
 PDF uploaded to the inbox bucket
@@ -13,7 +13,7 @@ PDF uploaded to the inbox bucket
 No Textract (not on the AWS Free plan); the B1 extractor is pure Python and runs in Lambda as is.
 This leg covers extraction only. The n8n approval flow and Airtable stay local (B2, B3).
 
-## What `deploy.ps1` would create (ap-southeast-2)
+## What `deploy.ps1` creates (ap-southeast-2)
 
 | Resource | Count | Settings that limit cost |
 |---|---|---|
@@ -47,8 +47,8 @@ find wheels for the Lambda platform on Windows, `sam build --use-container` (Doc
 ## What was tested (locally, moto)
 
 `tests/test_cloud.py`, 8 tests, fake S3 / SQS / DynamoDB, no account:
-- All 12 synthetic PDFs through the worker: inv_09 stored as `duplicate` of inv_01, inv_11 and
-  inv_12 as `needs_review`, the rest `extracted`. Scored with `upload_demo.py`'s own comparison,
+- All 12 synthetic PDFs through the worker: inv_09 stored as `duplicate` of inv_01, inv_10
+  (missing due date), inv_11 and inv_12 as `needs_review`, the rest `extracted`. Scored with `upload_demo.py`'s own comparison,
   the DynamoDB round trip gives **99/108 fields correct, the same as the local accuracy report**.
 - Same file processed twice is not a duplicate of itself; URL-encoded keys with spaces work.
 - A broken "PDF" is reported in `batchItemFailures` (so SQS retries it) while a good file in the
@@ -57,8 +57,20 @@ find wheels for the Lambda platform on Windows, `sam build --use-container` (Doc
 - `build.py` output holds only the Lambda code (no API, review queue or `.env`).
 - `cfn-lint aws/template.yaml`: no errors.
 
-## Not tested yet
+## What ran on real AWS (21 Nov 2026)
 
-- Nothing on real AWS: no deploy, no real S3 events, no IAM check, no CloudWatch logs.
-- `sam build` has not been run, so the Lambda package size and the Linux wheels are unchecked.
-- moto does not enforce the 3-receive redrive; `poison_test.py` will show it on the real stack.
+| Check | Result |
+|---|---|
+| `upload_demo.py`: 12 synthetic PDFs into the inbox bucket | all 12 processed via S3 event -> SQS -> Lambda; 21 DynamoDB items (12 `INVOICE#`, 9 `DUPKEY#`) |
+| Accuracy (same scoring as B1) | **99/108 fields correct**, identical to the local run; the 9 misses are all inv_12, the image-only PDF (`no_text_layer`) |
+| Flags | inv_09 `duplicate` of inv_01; inv_10 (missing due date), inv_11, inv_12 `needs_review` |
+| `poison_test.py` (a "PDF" that is not a PDF) | failed at receive counts 1, 2, 3 (about 6 minutes apart, the queue's visibility timeout), then found in the dead-letter queue and deleted |
+| Lambda | 256-718 ms per PDF, about 115 MB of the 512 MB used; `sam build` found Linux wheels on Windows, no Docker needed |
+| Teardown | `teardown.ps1` + SAM artifact stack removed; nothing left (see A4 README for the full listing) |
+| Cost | both budgets at $0.00; Free plan credits $159.999667 remaining after teardown |
+
+## Still not proven
+
+- Only 12 synthetic invoices, one at a time. No load, no real supplier PDFs.
+- The cloud leg stops at DynamoDB. Approval (n8n) and Airtable sync were not moved to AWS.
+- Image-only PDFs still need OCR (Textract is not on the Free plan), so they are flagged for review.

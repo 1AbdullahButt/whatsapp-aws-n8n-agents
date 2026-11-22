@@ -152,7 +152,10 @@ from `requirements-voice.txt`. One tester, one phone. Steps in `docs/A3_PHONE_TE
 - Real WhatsApp beyond A2-A3: only about ten messages from one phone to a test number of an
   unpublished app. No other testers, accents, noisy audio or Urdu/English mixed voice notes.
 - Whisper accuracy is not measured; only the two transcripts above were checked by eye.
-- Real AWS: nothing deployed yet. The A4 Lambda code, SAM template and DynamoDB repository have only run against moto (see `aws/README.md`).
+- Real AWS (A4) ran once, 21-22 Nov 2026, in ap-southeast-2 on the Free plan, then was torn down:
+  text -> ticket -> reply, voice note -> S3 + "transcription pending" -> transcribed on the PC,
+  poison message -> dead-letter queue after 3 tries, $0.00 spent. Gaps found there (a failed
+  reply is not resent, INFO logs not in CloudWatch) are listed in `aws/README.md`.
 - The `ticket_update` template has not been created, approved or sent for real;
   all template sends are simulated by the fake client.
 - Load, concurrency between several server processes, and long-running use.
