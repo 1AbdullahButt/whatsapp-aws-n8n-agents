@@ -94,6 +94,8 @@ Do this only when you are ready to start A4: the Free plan's 6-month clock start
 
 After the demo Claude gives you `sam delete` commands and you delete the access key in IAM (step 5 screen -> **Deactivate** -> **Delete**).
 
+IAM access key deleted on 23 Nov 2026.
+
 ## Step 5: phone tests and recordings (A2, A3, A5)
 
 - A2: `tenant-desk/docs/A2_RECORDING_SCRIPT.md` (done 21 Nov 2026).
