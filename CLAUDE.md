@@ -39,5 +39,6 @@ cd invoice-agent && .venv\Scripts\python -m pytest -q
 - [x] A4 AWS (21-22 Nov 2026, ap-southeast-2): deployed, text -> ticket -> reply and voice note -> S3 + pending -> PC transcription on the phone, poison -> DLQ; torn down. Fixed SSM slash policy + 5-min secret refresh (81 tests). Gaps: failed reply not resent after dedupe, INFO logs not in CloudWatch.
 - [x] Portfolio summary (23 Nov 2026): docs/PORTFOLIO_SUMMARY.md; AWS screenshots committed (019b3e3).
 - [x] Published (23 Nov 2026): public repo https://github.com/1AbdullahButt/whatsapp-aws-n8n-agents
+- [x] Repo cleanup (24 Nov 2026): README title, MIT license (GitHub shows MIT), AGENTS.md gitignored and kept local only.
 - [ ] A5 pilot
 - [ ] B5 optional RAG
