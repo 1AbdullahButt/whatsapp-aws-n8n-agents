@@ -50,7 +50,7 @@ voice note transcript, invoices with `duplicate` and `needs_review` status), the
 SQS queues, the three CloudWatch log lines of the poison test, the SSM parameters as SecureString,
 the WhatsApp chat on the phone and both budgets at $0.00. Account and phone numbers are blurred.
 
-How to read the phone screenshot (`00_whatsapp_chat.jpg`, times in Pakistan time, UTC+5):
+How to read the phone screenshot (`00_whatsapp_chat.jpg`, times in UTC+5):
 
 - The upper part (voice note -> TD-0002 heating, "Water is now on the floor", the office reply
   and "Thanks") is the earlier **local run** (A3, server on the PC through a Cloudflare tunnel).

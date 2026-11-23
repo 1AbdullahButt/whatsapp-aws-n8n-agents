@@ -18,10 +18,14 @@ data/
 media/
 outbox/
 *.log
+*.ogg
+*.opus
+tmp/
 
 # AWS SAM
 .aws-sam/
 samconfig.toml
+.aws/
 
 # Models and caches
 models/

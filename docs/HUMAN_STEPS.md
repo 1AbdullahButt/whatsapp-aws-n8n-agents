@@ -12,8 +12,8 @@ copy invoice-agent\.env.example invoice-agent\.env
 
 | Step | Status |
 |---|---|
-| Meta developer account, app "Property Support Bot", WhatsApp test number | First test number was BANNED by Meta (21 Nov 2026), see `docs/DECISIONS.md` #15 |
-| Second app "Tenant Desk Demo 2" on portfolio "Abdullah Demo Lab", new test number | Done, used for A2 (no payment method, keep it that way) |
+| Meta developer account, WhatsApp test number | First test number was restricted by Meta (21 Nov 2026), see `docs/DECISIONS.md` #15 |
+| Second app, new test number | Done, used for A2 (no payment method, keep it that way) |
 | cloudflared installed | Done |
 | Airtable account, base "Invoice Agent", scoped token | Done (B3, 21 Nov 2026) |
 | AWS account | After A3 |
@@ -22,21 +22,20 @@ copy invoice-agent\.env.example invoice-agent\.env
 
 ## Step 1 (before A2): new portfolio, new app, values into `tenant-desk/.env`
 
-These are the steps that worked on 21 Nov 2026, after the first test number was banned. Meta's screens change often; the names below are what we saw.
+These are the steps that worked on 21 Nov 2026, after the first test number was restricted. Meta's screens change often; the names below are what we saw.
 
-1. https://business.facebook.com -> create a **new business portfolio** (we used "Abdullah Demo Lab"). Skip anything that asks for payment.
-2. https://developers.facebook.com/apps -> **Create app**. Pick the **WhatsApp** use case ("Connect with customers through WhatsApp"), attach it to the new portfolio, name it (we used "Tenant Desk Demo 2").
-3. Meta may ask for your **Facebook password again** at several points (creating the app, showing the secret, generating tokens). That is normal; re-enter it.
-4. If a screen offers **Add payment method**, skip it. Never add one.
-5. In the app: **WhatsApp** -> **API Setup**. A free test number is shown under **From**. Copy into `tenant-desk/.env`:
+1. https://business.facebook.com -> create a **new business portfolio**. Skip anything that asks for payment.
+2. https://developers.facebook.com/apps -> **Create app**. Pick the **WhatsApp** use case ("Connect with customers through WhatsApp"), attach it to the new portfolio and name it.
+3. If a screen offers **Add payment method**, skip it. Never add one.
+4. In the app: **WhatsApp** -> **API Setup**. A free test number is shown under **From**. Copy into `tenant-desk/.env`:
    - **Generate access token** -> `WHATSAPP_TOKEN=`
    - **Phone number ID** (a 15-16 digit number, not the +1 555 phone number) -> `WHATSAPP_PHONE_NUMBER_ID=`
    - **WhatsApp Business Account ID** -> `WHATSAPP_BUSINESS_ACCOUNT_ID=`
-6. Same page, **To** -> **Manage phone number list** -> add your own WhatsApp number and enter the code Meta sends you. Each app has its own list: without this, replies fail with error **131030** "Recipient phone number not in allowed list".
-7. **App settings** -> **Basic** -> **App secret** -> **Show** -> `WHATSAPP_APP_SECRET=`.
-8. Make up a verify token (any long string) -> `WHATSAPP_VERIFY_TOKEN=`.
+5. Same page, **To** -> **Manage phone number list** -> add your own WhatsApp number and enter the code Meta sends you. Each app has its own list: without this, replies fail with error **131030** "Recipient phone number not in allowed list".
+6. **App settings** -> **Basic** -> **App secret** -> **Show** -> `WHATSAPP_APP_SECRET=`.
+7. Make up a verify token (any long string) -> `WHATSAPP_VERIFY_TOKEN=`.
 
-**Tokens expire.** The access token from API Setup lasts about 24 hours. When replies start failing with 401 / "Session has expired", generate a new one, paste it into `.env`, and ask Claude to restart the server (it reads `.env` only at start).
+**Tokens expire.** The temporary access token from API Setup stopped working after about 80 minutes on 22 Nov 2026. When replies start failing with 401 / "Session has expired", generate a new one, paste it into `.env`, and ask Claude to restart the server (it reads `.env` only at start).
 
 ## Step 2 (before A2): connect the webhook through a tunnel
 
@@ -60,7 +59,7 @@ Only needed if you want to look at the workflows in the browser (for screenshots
 2. Open http://localhost:5690. n8n asks you to set up an owner account. This account is stored only in the local Docker volume `invoice_agent_n8n_data`; it is not an n8n Cloud sign-up. Use any email and a new password (not one you use elsewhere). Skip/decline any "get a free license" or survey prompt.
 3. Open **Invoice intake** to see the flow. When finished: `docker compose down`.
 
-Do not open the old LendLoop instance (port 5678) for this project.
+Do not open the earlier n8n instance (port 5678) for this project.
 
 ## Step 3 (before B3): Airtable base and token
 
@@ -81,7 +80,7 @@ Do this only when you are ready to start A4: the Free plan's 6-month clock start
 
 1. https://aws.amazon.com -> **Create an AWS account**. Use an email you check. When asked for a plan, choose **Free plan** (credits, cannot be billed, account is suspended at the end instead of charged).
 2. Sign in as the root user -> top right account menu -> **Security credentials** -> **Assign MFA device** -> authenticator app. Root is used only for billing and emergencies after this.
-3. Region: top right, pick **Asia Pacific (Sydney) ap-southeast-2** and keep it for both projects (this account is region-locked to Sydney by an organization policy; us-east-1 is denied).
+3. Region: top right, pick **Asia Pacific (Sydney) ap-southeast-2** and keep it for both projects.
 4. Budgets (before anything is deployed): **Billing and Cost Management** -> **Budgets** -> **Create budget** -> **Use a template** -> **Zero spend budget**, your email. Then a second one: **Monthly cost budget**, amount **$1**, alerts at 50%, 80%, 100%. Tell Claude when both show in the list; Claude will ask for a screenshot of the Budgets list (no account number visible).
 5. IAM user for deploys: **IAM** -> **Users** -> **Create user** `portfolio-deployer`, no console access. Permissions: **Attach policies directly** -> `AdministratorAccess` (simplest for a short demo; Claude will list exactly what SAM creates before each deploy). Then the user -> **Security credentials** -> **Create access key** -> **Command Line Interface (CLI)** -> tick the confirmation -> copy the two values. Do not paste them in chat.
 6. Install the tools in a terminal:

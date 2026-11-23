@@ -68,7 +68,7 @@ remove SAM's artifact stack: `sam delete --stack-name aws-sam-cli-managed-defaul
 
 ## What was tested (locally, moto)
 
-`tests/test_cloud.py`, 12 tests, fake AWS in memory, no account:
+`tests/test_cloud.py`, 15 tests, fake AWS in memory, no account:
 - webhook Lambda: verify challenge ok / 403; signed POST (plain and base64 body) lands on SQS;
   bad or missing signature -> 401 and nothing queued.
 - worker Lambda: text -> ticket + plain-text reply; duplicate delivery ignored; a bad body is
@@ -77,6 +77,8 @@ remove SAM's artifact stack: `sam delete --stack-name aws-sam-cli-managed-defaul
   template path but the real client blocks template sends.
 - `transcribe_pending`: fills the transcript, updates category and urgency, second run does nothing.
 - `put_secrets.py` writes SecureStrings; `build.py` output has the Lambda code and no server, `.env` or venv.
+- SSM read policy matches parameter names that start with `/`; secrets are cached, then
+  re-read after 5 minutes; the worker rebuilds its clients on the same schedule.
 - `cfn-lint aws/template.yaml`: no errors.
 
 ## What ran on real AWS (21-22 Nov 2026)

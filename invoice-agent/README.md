@@ -1,11 +1,13 @@
-﻿# invoice-agent (milestones B1 + B2 + B3)
+﻿# invoice-agent (milestones B1 + B2 + B3 + B4)
 
 Reads invoice PDFs locally, pulls out the key fields, flags anything a
 human should check, and spots invoices that were sent twice (B1). An n8n
 workflow then runs each invoice end to end: duplicate check, payment
 status from a **mock** accounting API, a reminder draft for unpaid and
 overdue invoices, a human approve/reject step, and an error workflow (B2).
-Everything runs on your own machine. No cloud services, no paid APIs.
+B1 and B2 run on your own machine with no paid APIs. B3 syncs results to a
+free Airtable base. B4 ran the extractor on AWS for one day, then the stack
+was deleted (see [aws/README.md](aws/README.md)).
 **Nothing is emailed**: approved reminders are only written to a local
 file.
 
@@ -150,7 +152,7 @@ ALL FIELDS            99/108
 - Real-world invoices from real vendors (none were used)
 - Scanned PDFs / OCR (not implemented; image-only PDFs are only flagged)
 - Multi-page invoices, non-English invoices, comma-decimal amounts (`1.234,50`)
-- Airtable and AWS: those are later milestones (B3, B4)
+- Airtable beyond one free base, and AWS beyond the one-day B4 demo (see [aws/README.md](aws/README.md))
 - Load, concurrency or security review of the APIs beyond the inbox path check
 
 ---

@@ -1,4 +1,4 @@
-﻿# Tenant Desk (milestones A1-A3: local prototype, real WhatsApp text and voice notes on a test number)
+﻿# Tenant Desk (milestones A1-A4: local prototype, real WhatsApp text and voice notes on a test number, AWS leg)
 
 A WhatsApp maintenance desk for a small landlord or letting agent. A tenant
 sends a WhatsApp message (text or voice note) such as "my sink is leaking".
@@ -66,7 +66,7 @@ Everything lives in `app/`. Each file does one job:
 - `window.py` `inside_24h(last_inbound_ts, now)`.
 - `repository.py` the storage interface (see its docstring for every method).
 - `repo_sqlite.py` SQLite. `seen_messages.wa_message_id` is the PRIMARY KEY, inserted with `INSERT OR IGNORE`, so dedupe survives a restart.
-- `repo_dynamodb.py` DynamoDB single table (`pk`/`sk`, layout in the file's docstring). Dedupe by conditional put `attribute_not_exists(pk)`, ticket numbers by atomic `ADD`. Not wired into the server yet (that is milestone A4).
+- `repo_dynamodb.py` DynamoDB single table (`pk`/`sk`, layout in the file's docstring). Dedupe by conditional put `attribute_not_exists(pk)`, ticket numbers by atomic `ADD`. Used by the AWS worker (milestone A4, see [aws/README.md](aws/README.md)); the local server uses SQLite.
 - `whatsapp_client.py` `WhatsAppClient` (httpx, Graph API v21.0: `send_text`, `send_template`, `download_media`) and `FakeWhatsAppClient`, which only records calls.
 - `transcriber.py` `FasterWhisperTranscriber` (model `base`, CPU, int8, imported lazily) and `FakeTranscriber`.
 - `service.py` `handle_message` (the main flow) and `send_update` (any later message to a tenant).

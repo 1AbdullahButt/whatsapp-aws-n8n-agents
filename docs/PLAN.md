@@ -72,7 +72,7 @@ Missing or low-confidence fields are flagged, never guessed.
 no due date, one image-only.
 
 n8n: fresh docker-compose, its own volume `invoice_agent_n8n_data`, port 5690
-(LendLoop's old instance is not reused). Exported workflow JSON is checked for
+(an earlier n8n instance is not reused). Exported workflow JSON is checked for
 credentials before commit.
 
 AWS leg (B4): S3 upload -> S3 event -> SQS (+DLQ) -> Lambda running the same
@@ -108,7 +108,7 @@ Order: Phase 1 -> A1 + B1 in parallel -> A2 -> B2 -> A3 -> B3 -> A4 -> B4 -> A5 
 
 ## Risks
 
-- Meta setup friction (token expiry every ~24h, tunnel URL changes on restart). A1 proves the logic with synthetic payloads first.
+- Meta setup friction (the temporary token stopped working after about 80 minutes on 22 Nov 2026, tunnel URL changes on restart). A1 proves the logic with synthetic payloads first.
 - AWS sign-up asking for a card. Stop and ask. Code stays "tested locally with moto, not deployed" if needed.
 - The AWS 6-month clock starts at sign-up, so the account is created only after A3.
 - faster-whisper accuracy on mixed Urdu/English is unknown. Report what is observed.
