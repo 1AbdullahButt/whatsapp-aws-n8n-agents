@@ -23,16 +23,17 @@ approve it. Results sync to Airtable. Nothing is emailed.
 
 | Milestone | What was built | Tested on | Result |
 |---|---|---|---|
-| A1 | Local prototype: signature check, dedupe, classification, tickets, staff CLI | Local, fake WhatsApp client | 59 tests |
-| A2 | Real WhatsApp text messages | Real WhatsApp test number, own phone, Cloudflare tunnel | Ticket created, plain-text reply on the phone; 63 tests |
-| A3 | Voice notes + staff takeover | Real WhatsApp, local faster-whisper `base` | Voice note -> heating ticket; takeover, staff reply and release on the phone; 66 tests |
+| A1 | Local prototype: signature check, dedupe, classification, tickets, staff CLI | Local, fake WhatsApp client | Unit tests with fakes, no network |
+| A2 | Real WhatsApp text messages | Real WhatsApp test number, own phone, Cloudflare tunnel | Ticket created, plain-text reply on the phone |
+| A3 | Voice notes + staff takeover | Real WhatsApp, local faster-whisper `base` | Voice note -> heating ticket; takeover, staff reply and release on the phone |
 | A4 | SAM stack: Lambda function URL -> SQS -> worker Lambda -> DynamoDB, S3 for audio | moto, then real AWS (Sydney), one day | Text and voice note on the phone, poison message -> dead-letter queue; 81 tests |
 | B1 | PDF field extraction, confidence, flags, duplicate key | Local, 12 synthetic PDFs | 99/108 fields correct (the 9 misses are the image-only PDF); 145 tests |
 | B2 | n8n workflow: duplicate check, mock accounting API, reminder draft, approval, error workflow | Real n8n 2.48.7 in Docker | Live end-to-end 11/11; 176 tests |
 | B3 | Airtable sync (upsert script) | Real Airtable base, free plan | 12 invoices + 3 drafts + 1 error row; 14 API calls; 185 tests |
 | B4 | SAM stack: S3 upload -> SQS -> extractor Lambda -> DynamoDB | moto, then real AWS (Sydney), one day | 12/12 PDFs processed, 99/108 (same as local), poison PDF -> dead-letter queue; 193 tests |
 
-Test counts are the full suite for that project at the end of each milestone.
+Test counts are the full invoice-agent suite at the end of each milestone (from its README). For
+tenant-desk only today's full suite is given: 81 tests.
 
 ## What ran on real AWS
 
@@ -48,6 +49,16 @@ The screenshots show the stacks and their resources, the DynamoDB items (tickets
 voice note transcript, invoices with `duplicate` and `needs_review` status), the S3 objects, the
 SQS queues, the three CloudWatch log lines of the poison test, the SSM parameters as SecureString,
 the WhatsApp chat on the phone and both budgets at $0.00. Account and phone numbers are blurred.
+
+How to read the phone screenshot (`00_whatsapp_chat.jpg`, times in Pakistan time, UTC+5):
+
+- The upper part (voice note -> TD-0002 heating, "Water is now on the floor", the office reply
+  and "Thanks") is the earlier **local run** (A3, server on the PC through a Cloudflare tunnel).
+- The 4:09 pm message has **no reply**. That was the first message to AWS: the temporary WhatsApp
+  token had expired, the reply failed with a 401, and because dedupe had already marked the
+  message as seen, the SQS retry did not resend it (problem 3 and the first gap below).
+- From 5:16 pm is the **AWS run** (A4): the same text sent again after a new token, replied to
+  with TD-0001, then a voice note, also replied to.
 
 - [tenant-desk/docs/screenshots/a4-aws-sydney/](../tenant-desk/docs/screenshots/a4-aws-sydney/)
 - [invoice-agent/docs/screenshots/b4-aws-sydney/](../invoice-agent/docs/screenshots/b4-aws-sydney/)
@@ -73,7 +84,8 @@ These are in [DECISIONS.md](DECISIONS.md) entries 17 to 19.
 
 ## Not proven / known gaps
 
-- A failed reply is not resent. Dedupe runs before the reply, so the SQS retry after the 401 did nothing.
+- A failed reply is not resent. Dedupe runs before the reply, so the SQS retry after the 401 did
+  nothing; the 4:09 pm message in the phone screenshot never got an answer.
 - Only WARNING and ERROR log lines reach CloudWatch; INFO lines do not.
 - Voice notes are transcribed on a PC with `transcribe_pending.py`, not on AWS.
 - A transcript only changes the ticket category when it was `other`, so one ticket stayed `plumbing`
@@ -85,10 +97,7 @@ These are in [DECISIONS.md](DECISIONS.md) entries 17 to 19.
 
 ## Cost
 
-Both stacks, the SAM artifact stack, the S3 buckets and the SSM parameters were deleted after the
-demo, and a listing showed nothing left. Both budgets (`zero-spend` and `monthly-1-usd`) show
-$0.00. No card or payment method is on the AWS account or the Meta app. The exact amount of Free
-plan credit used is not known; about $160 of credit remained after teardown.
+No payment method was added to the AWS account (Free plan). Budget alerts at $0.01 and $1 both show $0.00, and both stacks were deleted after the demo. The exact credit used is not known (about $160 credit remained on the Free plan afterwards).
 
 ## Interview talking points
 

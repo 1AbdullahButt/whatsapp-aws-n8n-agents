@@ -27,7 +27,7 @@ py -3.12 -m venv .venv
 .venv\Scripts\python -m pytest -q
 ```
 
-Last local run: `78 passed`. The tests need no network and no accounts.
+Last local run: `81 passed` (23 Nov 2026). The tests need no network and no accounts.
 
 ## Run the server locally
 
