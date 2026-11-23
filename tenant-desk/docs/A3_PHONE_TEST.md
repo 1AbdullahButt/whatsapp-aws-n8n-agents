@@ -1,6 +1,6 @@
 # A3 phone test: voice note + human handoff (about 5 minutes)
 
-Uses the same setup as A2 (app "Tenant Desk Demo 2", test number, tunnel, server on port 8001).
+Uses the same setup as A2 (a WhatsApp Cloud API test number, tunnel, server on port 8001).
 Everything is free: Whisper runs locally (model `base`, CPU), and every reply is a plain-text
 message inside the 24-hour window. No template is ever sent.
 

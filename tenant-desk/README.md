@@ -123,7 +123,7 @@ latest inbound message; outside it, only pre-approved templates.
   ("Thanks, we have added your message to ticket TD-0001.") reached the phone (Graph API 200).
 - The first reply attempt failed with Meta error 131030 because the phone was not yet on the new
   app's recipient list. After adding it, replies worked.
-- Setup notes (second app after the first test number was banned, subscribing the app to the
+- Setup notes (second app after the first test number was restricted by Meta, subscribing the app to the
   WhatsApp Business Account, recipient list, token expiry, tunnel URL changes) are in
   `../docs/HUMAN_STEPS.md` Steps 1-2 and `../docs/DECISIONS.md` #15.
 - Template sends are blocked in `WhatsAppClient` (nothing is sent unless code passes

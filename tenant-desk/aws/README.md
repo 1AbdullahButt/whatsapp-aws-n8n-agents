@@ -84,7 +84,7 @@ remove SAM's artifact stack: `sam delete --stack-name aws-sam-cli-managed-defaul
 ## What ran on real AWS (21-22 Nov 2026)
 
 One deploy plus two stack updates, all in ap-southeast-2. The WhatsApp test number is the one
-from A2 ("Tenant Desk Demo 2"); messages came from Abdullah's own phone.
+from A2; messages came from the author's own phone.
 
 | Check | Result |
 |---|---|
