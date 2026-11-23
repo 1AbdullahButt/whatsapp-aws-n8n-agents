@@ -1,4 +1,4 @@
-# whatsapp-aws-n8n-agents
+# WhatsApp, AWS and n8n agents
 
 Two portfolio projects in Python 3.12: a WhatsApp maintenance desk built on the WhatsApp Cloud API
 and FastAPI, and an invoice-processing workflow built on n8n and FastAPI. Both have an AWS leg
@@ -56,6 +56,8 @@ deleted. Nothing is running now. Screenshots, with account and phone numbers blu
 
 All tenants, phone numbers, companies and invoices in this repo are made up. The only real
 messages were sent from the author's own phone to a WhatsApp test number.
+
+License: MIT (see LICENSE).
 
 ## Run the tests
 

@@ -39,3 +39,6 @@ Thumbs.db
 
 # Untrusted input
 incoming/
+
+# Local agent notes (not published)
+AGENTS.md
